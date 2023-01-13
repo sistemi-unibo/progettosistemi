@@ -1,10 +1,15 @@
 #include "types.h"
 #include "pandos_types.h"
+
+// pcb double linked list functions
+
 /*
+This method is used to initialize a variable to be tail pointer
+to a process queue.
+Return a pointer to the tail of an empty process queue; i.e. NULL
 Function 4
 Crea una lista di PCB, inizializzandola come lista vuota
 */
-
 void mkEmptyProcQ(struct list_head *head);
 
 /*
@@ -39,3 +44,32 @@ Rimuove il PCB puntato da p dalla coda dei processi puntata da head. Se p non è
 nella coda, restituisce NULL. (NOTA: p può trovarsi in una posizione arbitraria della coda).
 */
 pcb_t *outProcQ(struct list_head *head, pcb_t *p);
+
+// pcb double linked tree functions
+
+/*
+Function 10
+Restituisce TRUE se il PCB puntato da p non ha figli, FALSE altrimenti.
+*/
+int emptyChild(pcb_t *p);
+
+/*
+Function 11
+Inserisce il PCB puntato da p come figlio del PCB puntato da prnt
+*/
+void insertChild(pcb_t *prnt, pcb_t *p);
+
+/*
+Function 12
+Rimuove il primo figlio del PCB puntato da p. Se p non ha figli, restituisce NULL
+*/
+pcb_t *removeChild(pcb_t *p);
+
+/*
+Function 13
+Rimuove il PCB puntato da p dalla lista dei figli del padre. Se il PCB puntato da
+p non ha un padre, restituisce NULL, altrimenti restituisce l’elemento
+rimosso (cioè p). A differenza della removeChild, p può trovarsi in una
+posizione arbitraria (ossia non è necessariamente il primo figlio del padre)
+*/
+pcb_t *outChild(pcb_t *p)
