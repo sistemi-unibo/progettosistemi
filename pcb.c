@@ -1,4 +1,9 @@
-#include "header/pcb_list.h"
+#include "header/pcb.h"
+
+void initPcbs() {}
+void freePcb(pcb_t *p) {}
+pcb_t *allocPcb() {}
+
 void mkEmptyProcQ(struct list_head *head)
 {
 }
