@@ -13,14 +13,7 @@ void freePcb(pcb_t *p)
 {
     list_add_tail(&(p->p_list), pcbFree_h);
 }
-/*
-pcbs should be allocated by using:
-Function 3
-Restituisce NULL se la pcbFree_h è vuota.
-Altrimenti rimuove un elemento dalla
-pcbFree, inizializza tutti i campi (NULL/0)
-e restituisce l’elemento rimosso.
-*/
+
 pcb_t *allocPcb()
 {
     if (list_empty(pcbFree_h))
@@ -32,6 +25,13 @@ pcb_t *allocPcb()
         struct list_head *new = pcbFree_h->next;
         list_del(pcbFree_h->next);
         pcb_t *pcb = container_of(new, pcb_t, p_list);
+        pcb->p_parent = NULL;
+        INIT_LIST_HEAD(&pcb->p_child);
+        INIT_LIST_HEAD(&pcb->p_sib);
+        pcb->p_semAdd = NULL;
+        pcb->p_time = 0;
+        pcb->namespaces = NULL;
+        pcb->p_s = NULL;
     }
 }
 
