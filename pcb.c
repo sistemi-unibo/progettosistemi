@@ -30,7 +30,7 @@ void insertProcQ(struct list_head *head, pcb_t *p)
 {
 }
 
-pcb_t headProcQ(struct list_head *head)
+pcb_t *headProcQ(struct list_head *head)
 {
 }
 

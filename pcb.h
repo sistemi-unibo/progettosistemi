@@ -58,7 +58,7 @@ Function 7
 Restituisce l’elemento di testa della coda dei processi da head,
 SENZA RIMUOVERLO. Ritorna NULL se la coda non ha elementi.
 */
-pcb_t headProcQ(struct list_head *head);
+pcb_t *headProcQ(struct list_head *head);
 
 /*
 Function 8
