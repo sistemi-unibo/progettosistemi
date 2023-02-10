@@ -31,7 +31,18 @@ pcb_t *allocPcb()
         pcb->p_semAdd = NULL;
         pcb->p_time = 0;
         pcb->namespaces[NS_TYPE_MAX] = NULL;
-        //null_state(&pcb->p_s);
+        pcb->p_s.cause = 0;
+        pcb->p_s.entry_hi = 0;
+        pcb->p_s.hi = 0;
+        pcb->p_s.lo = 0;
+        pcb->p_s.pc_epc = 0;
+        pcb->p_s.status = 0;
+        for (int i = 0; i < STATE_GPR_LEN; i++)
+        {
+            pcb->p_s.gpr[i] = 0;
+        }
+
+        return pcb;
     }
 }
 
