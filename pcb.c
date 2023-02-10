@@ -30,8 +30,8 @@ pcb_t *allocPcb()
         INIT_LIST_HEAD(&pcb->p_sib);
         pcb->p_semAdd = NULL;
         pcb->p_time = 0;
-        pcb->namespaces = NULL;
-        pcb->p_s = NULL;
+        pcb->namespaces[NS_TYPE_MAX] = NULL;
+        //null_state(&pcb->p_s);
     }
 }
 
