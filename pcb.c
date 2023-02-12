@@ -49,14 +49,18 @@ pcb_t *allocPcb()
 void mkEmptyProcQ(struct list_head *head)
 {
     if (head != NULL)
+    {
         INIT_LIST_HEAD(head); // se head==NULL, non fa nulla; se head è diverso da NULL, usa la funzione INIT_LIST_HEAD (definita dal prof in list.h), che prendendo in input "head" (l'elemento sentinella), la inizializza impostando i puntatori avanti e indietro in modo che puntino all'elemento sentinella stesso (perché per ora la lista è vuota, c'è solo l'elemento sentinella head)
+    }
 }
 
 int emptyProcQ(struct list_head *head)
 {
     if (head == NULL)
-        return true;           // se non esiste head, l'elemento sentinella, la lista è vuota.
-    
+    {
+        return true; // se non esiste head, l'elemento sentinella, la lista è vuota.
+    }
+
     return (list_empty(head)); // "list_empty" è la funzione data dal prof in "list.h" che abbiamo usato anche nella funzione "allocPcb" che controlla se head->next è uguale a head (in tal caso nella lista è presente solo la sentinella head, quindi la lista è di fatto vuota)
 }
 
@@ -65,23 +69,54 @@ void insertProcQ(struct list_head *head, pcb_t *p)
     if (head != NULL && p != NULL)
     {
 
-        list_add_tail(/* & */p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*": "head" è di tipo "list_head*", quindi posso passarglielo come parametro, mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct, tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list", quindi come parametro a "list_add_tail" passo "p->p_list"
-    }                                   // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
-}                                       //inoltre Foxy mette prima di "list_add_tail" una funzione creata da lui chiamata "list_sdel", definita nel suo file "util.h", che a quanto ho capito elimina i rapporti (prev e next) che p aveva nella pcbfreetable (DI QUESTA COSA NON SONO SICURO)
+        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*": "head" è di tipo "list_head*", quindi posso passarglielo come parametro, mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct, tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list", quindi come parametro a "list_add_tail" passo "p->p_list"
+    }                                    // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
+} // inoltre Foxy mette prima di "list_add_tail" una funzione creata da lui chiamata "list_sdel", definita nel suo file "util.h", che a quanto ho capito elimina i rapporti (prev e next) che p aveva nella pcbfreetable (DI QUESTA COSA NON SONO SICURO)
 
 pcb_t *headProcQ(struct list_head *head)
 {
-    if(head==NULL || list_empty(head)) return NULL;
-
-    else return container_of(head->next, pcb_t, p_list); //container_of: estrae un membro di una struct da quest'ultima. Prende come paraemtro: un puntatore al membro della struct da estrarre, il tipo della struttura che contiene il membro da estrarre; il nome del membro della struct che devo estrarre
-                            // Foxy usa "list_next(head)", definita in list.h. (A quanto ho capito "list_next" dato un puntatore a un elemento della lista, restituisce il next)
+    if (head == NULL || list_empty(head))
+    {
+        return NULL;
+    }
+    else
+    {
+        return container_of(head->next, pcb_t, p_list); // container_of: estrae un membro di una struct da quest'ultima. Prende come paraemtro: un puntatore al membro della struct da estrarre, il tipo della struttura che contiene il membro da estrarre; il nome del membro della struct che devo estrarre
+                                                        //  Foxy usa "list_next(head)", definita in list.h. (A quanto ho capito "list_next" dato un puntatore a un elemento della lista, restituisce il next)
+    }
 }
 
 pcb_t *removeProcQ(struct list_head *head)
 {
-    list_del
+    if (head == NULL || list_empty(head))
+    {
+        return NULL;
+    }
+    else
+    {
+        struct list_head *p = head->next;
+        list_del(head->next);
+        return container_of(p, pcb_t, p_list);
+    }
 }
 
 pcb_t *outProcQ(struct list_head *head, pcb_t *p)
 {
+    if (head == NULL || list_empty(head))
+    {
+        return NULL;
+    }
+    else
+    {
+        struct list_head *x;
+        list_for_each(x, head)
+        {
+            if (container_of(x, pcb_t, p_list) == p)
+            {
+                list_del(x);
+                return container_of(x, pcb_t, p_list);
+            }
+        }
+    }
+    return NULL; // non ha trovato il pcb
 }

@@ -18,5 +18,6 @@
     "ratio": "c",
     "tuple": "c",
     "utility": "c"
-  }
+  },
+  "C_Cpp.errorSquiggles": "enabled"
 }
