@@ -123,11 +123,47 @@ pcb_t *outProcQ(struct list_head *head, pcb_t *p)
 
 int emptyChild(pcb_t *p)
 {
-    if(p==NULL)
+    if (p == NULL)
     {
         return true;
     }
 
-    return list_empty(&p->p_child); //list_empty controlla se "p->p_child" punta a "p": se sì vuol dire che p non ha figli e il puntatore che da "p" va ai figli, torna indietro; se "p->child" punta a qualcosa di diverso da p, vuol dire che p ha dei figli e quindi "list_empty" ritorna "false"
+    return list_empty(&p->p_child); // list_empty controlla se "p->p_child" punta a "p": se sì vuol dire che p non ha figli e il puntatore che da "p" va ai figli, torna indietro; se "p->child" punta a qualcosa di diverso da p, vuol dire che p ha dei figli e quindi "list_empty" ritorna "false"
 }
 
+void insertChild(pcb_t *prnt, pcb_t *p)
+{
+    if (prnt != NULL && p != NULL)
+    {
+        p->p_parent = prnt;
+        list_add_tail(&p->p_sib, &prnt->p_child);
+    }
+}
+
+pcb_t *removeChild(pcb_t *p)
+{
+    if (list_empty(&p->p_child) || p == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        struct list_head *tmp = (&p->p_child)->next;
+        list_del((&p->p_child)->next);
+        return container_of(tmp, pcb_t, p_sib);
+    }
+}
+
+pcb_t *outChild(pcb_t *p)
+{
+    if (p == NULL || &p->p_parent == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        p->p_parent = NULL;
+        list_del(&p->p_sib);
+        return p;
+    }
+}
