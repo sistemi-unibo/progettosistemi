@@ -120,3 +120,14 @@ pcb_t *outProcQ(struct list_head *head, pcb_t *p)
     }
     return NULL; // non ha trovato il pcb
 }
+
+int emptyChild(pcb_t *p)
+{
+    if(p==NULL)
+    {
+        return true;
+    }
+
+    return list_empty(&p->p_child); //list_empty controlla se "p->p_child" punta a "p": se sì vuol dire che p non ha figli e il puntatore che da "p" va ai figli, torna indietro; se "p->child" punta a qualcosa di diverso da p, vuol dire che p ha dei figli e quindi "list_empty" ritorna "false"
+}
+
