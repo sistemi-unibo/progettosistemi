@@ -1,3 +1,6 @@
+#ifndef _PCB_H
+#define _PCB_H
+
 #include "types.h"
 #include "pandos_types.h"
 #include "list.h"
@@ -102,3 +105,6 @@ rimosso (cioè p). A differenza della removeChild, p può trovarsi in una
 posizione arbitraria (ossia non è necessariamente il primo figlio del padre)
 */
 pcb_t *outChild(pcb_t *p);
+
+
+#endif

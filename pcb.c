@@ -9,6 +9,7 @@ void initPcbs()
         list_add(&pcbFree_table[i].p_list, pcbFree_h);
     }
 }
+
 void freePcb(pcb_t *p)
 {
     list_add_tail(&(p->p_list), pcbFree_h);
