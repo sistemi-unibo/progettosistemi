@@ -4,10 +4,16 @@
 #include "types.h"
 #include "pandos_types.h"
 #include "list.h"
+#include "pcb.h"
 
 semd_t semd_table[MAXPROC];
 struct list_head* semdFree_h;
 struct list_head* semd_h;
+
+
+//gets specified semaphore according to key
+semd_t* getsem(int *key);
+
 
 /*Viene inserito il PCB puntato da p nella coda dei
 processi bloccati associata al SEMD con chiave
