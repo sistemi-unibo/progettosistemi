@@ -1,5 +1,5 @@
-#ifndef _PCB_H
-#define _PCB_H
+#ifndef _LINUX_PCB_H
+#define _LINUX_PCB_H
 
 #include "types.h"
 #include "pandos_types.h"
