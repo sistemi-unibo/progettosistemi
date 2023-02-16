@@ -1,8 +1,8 @@
 #include "pcb.h"
 
-pcb_t pcbFree_table[MAXPROC];
-struct list_head pcbFree;
-struct list_head *pcbFree_h;
+static pcb_t pcbFree_table[MAXPROC];
+static struct list_head pcbFree;
+static struct list_head *pcbFree_h;
 void initPcbs()
 {
     INIT_LIST_HEAD(&pcbFree);
@@ -29,12 +29,17 @@ pcb_t *allocPcb()
         struct list_head *new = pcbFree_h->next;
         list_del(pcbFree_h->next);
         pcb_t *pcb = container_of(new, pcb_t, p_list);
+        pcb->p_list.next = NULL;
+        pcb->p_list.prev = NULL;
         pcb->p_parent = NULL;
         INIT_LIST_HEAD(&pcb->p_child);
         INIT_LIST_HEAD(&pcb->p_sib);
         pcb->p_semAdd = NULL;
         pcb->p_time = 0;
-        pcb->namespaces[NS_TYPE_MAX] = NULL;
+        for (int i = 0; i < NS_TYPE_MAX; i++)
+        {
+            pcb->namespaces[i] = NULL;
+        }
         pcb->p_s.cause = 0;
         pcb->p_s.entry_hi = 0;
         pcb->p_s.hi = 0;
@@ -73,12 +78,12 @@ void insertProcQ(struct list_head *head, pcb_t *p)
     if (head != NULL && p != NULL)
     {
 
-        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*": 
-        //"head" è di tipo "list_head*", quindi posso passarglielo come parametro, 
-        //mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct, 
-        //tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list", 
-        //quindi come parametro a "list_add_tail" passo "p->p_list"
-    }                                    // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
+        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*":
+        //"head" è di tipo "list_head*", quindi posso passarglielo come parametro,
+        // mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct,
+        // tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list",
+        // quindi come parametro a "list_add_tail" passo "p->p_list"
+    } // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
 } // inoltre Foxy mette prima di "list_add_tail" una funzione creata da lui chiamata "list_sdel", definita nel suo file "util.h", che a quanto ho capito elimina i rapporti (prev e next) che p aveva nella pcbfreetable (DI QUESTA COSA NON SONO SICURO)
 
 pcb_t *headProcQ(struct list_head *head)

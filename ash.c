@@ -1,7 +1,7 @@
 #include "ash.h"
 
 static semd_t semd_table[MAXPROC];
-struct list_head *semdFree_h;
+static struct list_head *semdFree_h;
 DEFINE_HASHTABLE(semd_h, 10);
 // aux function used to get a semaphore from the sem_h list given the key
 semd_t *getsem(int *key)
