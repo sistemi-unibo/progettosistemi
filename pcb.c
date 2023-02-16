@@ -70,7 +70,11 @@ void insertProcQ(struct list_head *head, pcb_t *p)
     if (head != NULL && p != NULL)
     {
 
-        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*": "head" è di tipo "list_head*", quindi posso passarglielo come parametro, mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct, tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list", quindi come parametro a "list_add_tail" passo "p->p_list"
+        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*": 
+        //"head" è di tipo "list_head*", quindi posso passarglielo come parametro, 
+        //mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct, 
+        //tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list", 
+        //quindi come parametro a "list_add_tail" passo "p->p_list"
     }                                    // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
 } // inoltre Foxy mette prima di "list_add_tail" una funzione creata da lui chiamata "list_sdel", definita nel suo file "util.h", che a quanto ho capito elimina i rapporti (prev e next) che p aveva nella pcbfreetable (DI QUESTA COSA NON SONO SICURO)
 
