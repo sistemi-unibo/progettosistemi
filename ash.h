@@ -7,9 +7,6 @@
 #include "pcb.h"
 #include "hashtable.h"
 
-static semd_t semd_table[MAXPROC];
-struct list_head *semdFree_h;
-DEFINE_HASHTABLE(semd_h, 10);
 
 // gets specified semaphore according to key
 semd_t *getsem(int *key);

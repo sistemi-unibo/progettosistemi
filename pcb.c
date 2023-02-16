@@ -1,5 +1,8 @@
 #include "pcb.h"
 
+pcb_t pcbFree_table[MAXPROC];
+struct list_head pcbFree;
+struct list_head *pcbFree_h;
 void initPcbs()
 {
     INIT_LIST_HEAD(&pcbFree);

@@ -5,9 +5,7 @@
 #include "pandos_types.h"
 #include "list.h"
 
-pcb_t pcbFree_table[MAXPROC];
-struct list_head pcbFree;
-struct list_head *pcbFree_h;
+
 
 // pcb double linked list functions
 /*

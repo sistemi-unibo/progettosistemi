@@ -1,5 +1,5 @@
 #ifndef NS_H
-#define ND_H
+#define NS_H
 
 #include "types.h"
 #include "pandos_types.h"
