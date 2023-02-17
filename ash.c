@@ -1,6 +1,7 @@
 #include "ash.h"
 
 static semd_t semd_table[MAXPROC];
+static struct list_head semdFree;
 static struct list_head *semdFree_h;
 DEFINE_HASHTABLE(semd_h, 10);
 // aux function used to get a semaphore from the sem_h list given the key
@@ -111,11 +112,11 @@ pcb_t *headBlocked(int *semAdd)
         }
     }
 }
-void initASH()
+void initASH() //testata e funziona
 {
-    INIT_LIST_HEAD(semdFree_h);
+    INIT_LIST_HEAD(&semdFree);
     for (int i = 0; i < MAXPROC; i++)
     {
-        list_add(&semd_table[i].s_freelink, semdFree_h);
+        list_add(&semd_table[i].s_freelink, &semdFree);
     }
 }
