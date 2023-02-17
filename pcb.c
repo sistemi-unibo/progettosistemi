@@ -144,7 +144,7 @@ int emptyChild(pcb_t *p) //ok
     return list_empty(&p->p_child); // list_empty controlla se "p->p_child" punta a "p": se sì vuol dire che p non ha figli e il puntatore che da "p" va ai figli, torna indietro; se "p->child" punta a qualcosa di diverso da p, vuol dire che p ha dei figli e quindi "list_empty" ritorna "false"
 }
 
-void insertChild(pcb_t *prnt, pcb_t *p)
+void insertChild(pcb_t *prnt, pcb_t *p) //ok
 {
     if (prnt != NULL && p != NULL)
     {
@@ -153,7 +153,7 @@ void insertChild(pcb_t *prnt, pcb_t *p)
     }
 }
 
-pcb_t *removeChild(pcb_t *p)
+pcb_t *removeChild(pcb_t *p) //ok
 {
     if (list_empty(&p->p_child) || p == NULL)
     {
@@ -167,9 +167,9 @@ pcb_t *removeChild(pcb_t *p)
     }
 }
 
-pcb_t *outChild(pcb_t *p)
+pcb_t *outChild(pcb_t *p) //ok
 {
-    if (p == NULL || &p->p_parent == NULL)
+    if (p == NULL || p->p_parent == NULL )
     {
         return NULL;
     }
@@ -177,6 +177,7 @@ pcb_t *outChild(pcb_t *p)
     {
         p->p_parent = NULL;
         list_del(&p->p_sib);
+        
         return p;
     }
 }

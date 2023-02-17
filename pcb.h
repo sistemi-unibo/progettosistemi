@@ -17,7 +17,6 @@ inizializzazione della struttura dati.
 */
 void initPcbs();
 
-static inline pcb_t *null_pcb(pcb_t *t);
 /*
 pcbs which are no longer in use can be returned to the pcbFree list by
 using the method:
