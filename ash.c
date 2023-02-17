@@ -1,8 +1,7 @@
 #include "ash.h"
 
 static semd_t semd_table[MAXPROC];
-static struct list_head semdFree;
-static struct list_head *semdFree_h;
+static struct list_head semdFree_h;
 DEFINE_HASHTABLE(semd_h, 10);
 // aux function used to get a semaphore from the sem_h list given the key
 semd_t *getsem(int *key)
@@ -29,14 +28,14 @@ int insertBlocked(int *semAdd, pcb_t *p)
     }
     else
     {
-        if (list_empty(semdFree_h)) // no more free semaphores to allocate
+        if (list_empty(&semdFree_h)) // no more free semaphores to allocate
         {
             return TRUE;
         }
         else // allocates a new semaphore
-        {
-            semd_t *new = semdFree_h->next;
-            list_del(semdFree_h->next);             // deletes the first entry from the list of free semaphores
+        { 
+            semd_t *new = container_of(semdFree_h.next, semd_t, s_link);
+            list_del(semdFree_h.next);             // deletes the first entry from the list of free semaphores
             hash_add(semd_h, &new->s_link, semAdd); // adds new sem to hashtable
             insertProcQ(&(new->s_procq), p);        // inserts pcb to tail of newsem procq list
             new->s_key = semAdd;
@@ -59,7 +58,7 @@ pcb_t *removeBlocked(int *semAdd)
         if (list_empty(&(sem->s_procq)))
         {
             hash_del(&(sem->s_link));
-            list_add(&(sem->s_freelink), semdFree_h);
+            list_add(&(sem->s_freelink), &semdFree_h);
         }
         return pcbdel;
     }
@@ -85,7 +84,7 @@ pcb_t *outBlocked(pcb_t *p)
             if (list_empty(&(sem->s_procq)))
             {
                 hash_del(&(sem->s_link));
-                list_add(&(sem->s_freelink), semdFree_h);
+                list_add(&(sem->s_freelink), &semdFree_h);
             }
             return p;
         }
@@ -114,9 +113,9 @@ pcb_t *headBlocked(int *semAdd)
 }
 void initASH() //testata e funziona
 {
-    INIT_LIST_HEAD(&semdFree);
-    for (int i = 0; i < MAXPROC; i++)
+    INIT_LIST_HEAD(&semdFree_h);
+    for (int i = 1; i < MAXPROC+1; i++)
     {
-        list_add(&semd_table[i].s_freelink, &semdFree);
+        list_add(&semd_table[i-1].s_freelink, &semdFree_h);
     }
 }
