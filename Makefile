@@ -33,8 +33,8 @@ VPATH = $(UMPS3_DATA_DIR)
 all : kernel.core.umps              #obiettivo:  prerequisiti
                                     #	comando
 kernel.core.umps : kernel			#	comando
-	umps3-elf2umps -k $<			                                # il make controlla se uno dei prerequisiti è stato modificato
-																	# più recentemente dell'obiettivo. In caso affermatovo esegue i comandi
+	umps3-elf2umps -k $<			                                
+																	
 kernel : p1test.o pcb.o ash.o ns.o crtso.o libumps.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 

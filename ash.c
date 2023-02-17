@@ -7,8 +7,8 @@ DEFINE_HASHTABLE(semd_h, 10);
 semd_t *getsem(int *key)
 {
     struct semd_t *x;
-    int j = 0;
-    hash_for_each(semd_h, j, x, s_link)
+    //int j = 0;
+    hash_for_each_possible(semd_h,  x, s_link, *key)
     {
         semd_t *sem = container_of(x, semd_t, s_link);
         if (sem->s_key == key)
@@ -22,6 +22,7 @@ semd_t *getsem(int *key)
 int insertBlocked(int *semAdd, pcb_t *p)
 {
     semd_t *sem = getsem(semAdd);
+    // semd_t *sem = container_of(semAdd, semd_t, s_link);
     if (sem != NULL) // semaphore found, inserts the pcb in semprocq
     {
         insertProcQ(&(sem->s_procq), p);
@@ -36,7 +37,7 @@ int insertBlocked(int *semAdd, pcb_t *p)
         { 
             semd_t *new = container_of(semdFree_h.next, semd_t, s_link);
             list_del(semdFree_h.next);             // deletes the first entry from the list of free semaphores
-            hash_add(semd_h, &new->s_link, semAdd); // adds new sem to hashtable
+            hash_add(semd_h, &new->s_link, *semAdd); // adds new sem to hashtable
             insertProcQ(&(new->s_procq), p);        // inserts pcb to tail of newsem procq list
             new->s_key = semAdd;
         }
@@ -66,7 +67,7 @@ pcb_t *removeBlocked(int *semAdd)
 
 pcb_t *outBlocked(pcb_t *p)
 {
-    semd_t *sem = p->p_semAdd;
+    semd_t *sem = container_of(p->p_semAdd, semd_t, s_link);
 
     if (sem == NULL)
     {
@@ -114,8 +115,8 @@ pcb_t *headBlocked(int *semAdd)
 void initASH() //testata e funziona
 {
     INIT_LIST_HEAD(&semdFree_h);
-    for (int i = 1; i < MAXPROC+1; i++)
+    for (int i = 0; i < MAXPROC; i++)
     {
-        list_add(&semd_table[i-1].s_freelink, &semdFree_h);
+        list_add(&semd_table[i].s_freelink, &semdFree_h);
     }
 }

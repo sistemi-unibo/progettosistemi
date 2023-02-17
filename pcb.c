@@ -6,9 +6,9 @@ static struct list_head pcbFree_h;
 void initPcbs() //ok
 {
     INIT_LIST_HEAD(&pcbFree_h);
-    for (int i = 1; i < MAXPROC+1; i++)
+    for (int i = 0; i < MAXPROC; i++)
     {
-        list_add(&pcbFree_table[i-1].p_list, &pcbFree_h);
+        list_add(&pcbFree_table[i].p_list, &pcbFree_h);
     }
 }
 
