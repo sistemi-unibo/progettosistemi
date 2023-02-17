@@ -14,5 +14,6 @@ outChild ok
 Removing...   
 insertChild, removeChild and emptyChild ok   
 process tree module ok      
-Initialized active semaphore hash   
-insertBlocked test #1 started  
+Initialized Namespaces
+getNamespace test #1 started  
+getNamespace test #1 ok
