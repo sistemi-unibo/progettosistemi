@@ -14,6 +14,7 @@ outChild ok
 Removing...   
 insertChild, removeChild and emptyChild ok   
 process tree module ok      
-Initialized Namespaces
-getNamespace test #1 started  
-getNamespace test #1 ok
+Initialized active semaphore hash   
+insertBlocked test #1 started  
+insertBlocked test #2 started  
+removeBlocked: fails to return to free list   

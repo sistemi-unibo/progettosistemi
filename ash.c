@@ -8,42 +8,50 @@ semd_t *getsem(int *key)
 {
     struct semd_t *x;
     //int j = 0;
-    hash_for_each_possible(semd_h,  x, s_link, *key)
+    hash_for_each_possible(semd_h,  x, s_link, (unsigned long)key)
     {
-        semd_t *sem = container_of(x, semd_t, s_link);
-        if (sem->s_key == key)
+        if (x->s_key == key)
         {
-            return sem; // semaphore found
+            return x; // semaphore found
         }
+          // no semaphore found
     }
-    return NULL; // no semaphore found
+    return NULL;
+
 }
 
 int insertBlocked(int *semAdd, pcb_t *p)
 {
+    // Controlliamo se i parametri sono giusti
+    if (semAdd == NULL || p == NULL)
+        return true;
+    if (p->p_semAdd != NULL)
+        return true;
+
     semd_t *sem = getsem(semAdd);
-    // semd_t *sem = container_of(semAdd, semd_t, s_link);
     if (sem != NULL) // semaphore found, inserts the pcb in semprocq
     {
-        insertProcQ(&(sem->s_procq), p);
+        list_add_tail(&p->p_list, &sem->s_procq);
+        p->p_semAdd = semAdd;
+        return false;
     }
-    else
+
+
+    if (list_empty(&semdFree_h)) // no more free semaphores to allocate
     {
-        if (list_empty(&semdFree_h)) // no more free semaphores to allocate
-        {
-            return TRUE;
-        }
-        else // allocates a new semaphore
-        { 
-            semd_t *new = container_of(semdFree_h.next, semd_t, s_link);
-            list_del(semdFree_h.next);             // deletes the first entry from the list of free semaphores
-            hash_add(semd_h, &new->s_link, *semAdd); // adds new sem to hashtable
-            insertProcQ(&(new->s_procq), p);        // inserts pcb to tail of newsem procq list
-            new->s_key = semAdd;
-        }
+        return TRUE;
     }
+    // allocates a new semaphore
+
+    sem = list_first_entry(&semdFree_h, semd_t, s_freelink);
+    list_del(&sem->s_freelink);       // deletes the first entry from the list of free semaphores
+    sem->s_key = semAdd;
+    INIT_LIST_HEAD(&sem->s_procq);
+    list_add_tail(&p->p_list, &sem->s_procq);// inserts pcb to tail of newsem procq list
     p->p_semAdd = semAdd;
+    hash_add(semd_h, &sem->s_link, (unsigned long)semAdd); // adds new sem to hashtable
     return FALSE;
+
 }
 
 pcb_t *removeBlocked(int *semAdd)

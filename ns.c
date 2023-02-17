@@ -19,5 +19,5 @@ void initNamespaces() //testata e funziona
 nsd_t *getNamespace(pcb_t *p, int type)
 {
 return p->namespaces[type];
-
 }
+
