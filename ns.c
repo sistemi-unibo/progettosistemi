@@ -4,7 +4,7 @@ static nsd_t type_nsd[MAXPROC];
 static struct list_head type_nsFree_h;
 static struct list_head type_nsList_h;
 
-void initNamespaces() //testata e funziona
+void initNamespaces() // testata e funziona
 {
     INIT_LIST_HEAD(&type_nsFree_h);
     INIT_LIST_HEAD(&type_nsList_h);
@@ -12,12 +12,25 @@ void initNamespaces() //testata e funziona
     {
         list_add(&type_nsd[i].n_link, &type_nsFree_h);
     }
-    
 }
-
 
 nsd_t *getNamespace(pcb_t *p, int type)
 {
-return p->namespaces[type];
+    return p->namespaces[type];
 }
 
+/*int addNamespace(pcb_t *p, nsd_t *ns)
+{
+    if (p == NULL)
+    {
+        return FALSE;
+    }
+
+    if (ns == NULL )  //it is a base
+    {
+        
+    }
+    
+
+    return FALSE;
+}*/
