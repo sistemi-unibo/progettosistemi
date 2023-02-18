@@ -24,3 +24,9 @@ ASH module ok
 Initialized Namespaces
 getNamespace test #1 started  
 getNamespace test #1 ok
+addNamespace test #1 started
+addNamespace: test ok
+addNamespace(2): test started
+addNamespace(2): test ok
+Namespace module ok
+So Long and Thanks for All the Fish

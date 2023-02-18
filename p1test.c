@@ -335,43 +335,43 @@ int main(void) {
     }
 
     addokbuf("getNamespace test #1 ok\n");
-    // addokbuf("addNamespace test #1 started\n");
-    // pid_ns = allocNamespace(NS_PID);
-    // if (pid_ns == NULL)
-    //         adderrbuf("Unexpected null on allocNS");
-    // if (addNamespace(procp[3], pid_ns) != TRUE)
-    //         adderrbuf("addNamespace: Unexpected FALSE");
-    // if (getNamespace(procp[3], NS_PID) == getNamespace(procp[0], NS_PID))
-    //         adderrbuf("getNamespace: Unexpected root namespace for process 3");
-    // if (getNamespace(procp[3], NS_PID) != pid_ns)
-    //         adderrbuf("getNamespace: Unexpected namespace for process 3");
-    // addokbuf("addNamespace: test ok\n");
+    addokbuf("addNamespace test #1 started\n");
+    pid_ns = allocNamespace(NS_PID);
+    if (pid_ns == NULL)
+            adderrbuf("Unexpected null on allocNS");
+    if (addNamespace(procp[3], pid_ns) != TRUE)
+            adderrbuf("addNamespace: Unexpected FALSE");
+    if (getNamespace(procp[3], NS_PID) == getNamespace(procp[0], NS_PID))
+            adderrbuf("getNamespace: Unexpected root namespace for process 3");
+    if (getNamespace(procp[3], NS_PID) != pid_ns)
+            adderrbuf("getNamespace: Unexpected namespace for process 3");
+    addokbuf("addNamespace: test ok\n");
 
-    // addokbuf("addNamespace(2): test started\n");
-    // /* Change namespace with child */
-    // insertChild(procp[1], procp[2]);
-    // addNamespace(procp[1], pid_ns);
+    addokbuf("addNamespace(2): test started\n");
+    /* Change namespace with child */
+    insertChild(procp[1], procp[2]);
+    addNamespace(procp[1], pid_ns);
 
-    // if (getNamespace(procp[2], NS_PID) == NULL)
-	//     adderrbuf("Child namespace is the root one");
-    // if (getNamespace(procp[2], NS_PID) != pid_ns)
-    //         adderrbuf("Child namespace is not the one of the parent!");
-    // addokbuf("addNamespace(2): test ok\n");
+    if (getNamespace(procp[2], NS_PID) == NULL)
+	    adderrbuf("Child namespace is the root one");
+    if (getNamespace(procp[2], NS_PID) != pid_ns)
+            adderrbuf("Child namespace is not the one of the parent!");
+    addokbuf("addNamespace(2): test ok\n");
 
-    // pid_ns2 = allocNamespace(NS_PID);
+    pid_ns2 = allocNamespace(NS_PID);
 
-    // addNamespace(procp[1], pid_ns2);
+    addNamespace(procp[1], pid_ns2);
 
-    // if (getNamespace(procp[0], NS_PID) != NULL)
-    //         adderrbuf("Root namespace changed!");
-    // if (getNamespace(procp[1], NS_PID) != pid_ns2)
-    //         adderrbuf("Parent namespace did not changed!");
-    // if (getNamespace(procp[2], NS_PID) != pid_ns2)
-    //         adderrbuf("Child namespace did not changed!");
-    // if (getNamespace(procp[3], NS_PID) != pid_ns)
-    //         adderrbuf("Other process namespace changed!");
+    if (getNamespace(procp[0], NS_PID) != NULL)
+            adderrbuf("Root namespace changed!");
+    if (getNamespace(procp[1], NS_PID) != pid_ns2)
+            adderrbuf("Parent namespace did not changed!");
+    if (getNamespace(procp[2], NS_PID) != pid_ns2)
+            adderrbuf("Child namespace did not changed!");
+    if (getNamespace(procp[3], NS_PID) != pid_ns)
+            adderrbuf("Other process namespace changed!");
 
-    // addokbuf("Namespace module ok\n");
-    // addokbuf("So Long and Thanks for All the Fish\n");
+    addokbuf("Namespace module ok\n");
+    addokbuf("So Long and Thanks for All the Fish\n");
     return 0;
 }
