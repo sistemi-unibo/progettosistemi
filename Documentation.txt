@@ -1,0 +1,8 @@
+Scelte implementative:
+
+Nell'implementazione delle 23 funzioni richieste per la fase 1 abbiamo seguito la struttura e le linee guida riportate
+nelle slides del corso riguardanti il progetto. In ogni funzione richiesta ci siamo avvalsi delle funzioni già presenti nei file 
+forniti come materiale di base. L'unica funzione ausiliaria da noi definita è getsem(), dichiarata in ash.h, la quale cerca 
+e ritorna un semaforo in base alla chiave passata come parametro.
+Non è stata fatta alcuna madifica ai file forniti come base, dunque il nostro lavoro è concentrato nei file aggiuntivi 
+da noi creati per le funzioni richieste.
