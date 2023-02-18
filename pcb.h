@@ -8,6 +8,7 @@
 
 
 // pcb double linked list functions
+
 /*
 To initialize the pcbFree List:
 Function 1
@@ -74,6 +75,8 @@ Rimuove il PCB puntato da p dalla coda dei processi puntata da head. Se p non è
 nella coda, restituisce NULL. (NOTA: p può trovarsi in una posizione arbitraria della coda).
 */
 pcb_t *outProcQ(struct list_head *head, pcb_t *p);
+
+
 
 // pcb double linked tree functions
 

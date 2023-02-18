@@ -8,6 +8,7 @@ DEFINE_HASHTABLE(semd_h, 10);
 semd_t *getsem(int *key)
 {
     struct semd_t *x;
+    // search for the corresponding semaphore
     hash_for_each_possible(semd_h, x, s_link, (unsigned long)key)
     {
         if (x->s_key == key)
@@ -21,11 +22,16 @@ semd_t *getsem(int *key)
 
 int insertBlocked(int *semAdd, pcb_t *p)
 {
-    // Parameters check
+    // Parameters check:
     if (semAdd == NULL || p == NULL)
+    {
         return TRUE;
+    }
+
     if (p->p_semAdd != NULL)
+    {
         return TRUE;
+    }
 
     semd_t *sem = getsem(semAdd);
     if (sem != NULL) // semaphore found, inserts the pcb in semprocq
@@ -38,6 +44,7 @@ int insertBlocked(int *semAdd, pcb_t *p)
     {
         return TRUE;
     }
+
     // allocates a new semaphore
     sem = list_first_entry(&semdFree_h, semd_t, s_freelink);
     list_del(&sem->s_freelink); // deletes the first entry from the list of free semaphores
@@ -51,6 +58,7 @@ int insertBlocked(int *semAdd, pcb_t *p)
 
 pcb_t *removeBlocked(int *semAdd)
 {
+    //check:
     if (semAdd == NULL)
     {
         return NULL;
@@ -64,14 +72,14 @@ pcb_t *removeBlocked(int *semAdd)
     }
     else
     {
-        if (list_empty(&(sem->s_procq)))
+        if (list_empty(&(sem->s_procq)))  //no processes blocked on sem
         {
             return NULL;
         }
 
-        pcb_t *pcbdel = removeProcQ(&(sem->s_procq));
+        pcb_t *pcbdel = removeProcQ(&(sem->s_procq)); //saves process to remove
         pcbdel->p_semAdd = NULL;
-        if (list_empty(&(sem->s_procq)))
+        if (list_empty(&(sem->s_procq))) //if it was the last process blocked on sem the sem->s_procq becomes empty
         {
             hash_del(&(sem->s_link));
             list_add(&(sem->s_freelink), &semdFree_h);
@@ -82,6 +90,7 @@ pcb_t *removeBlocked(int *semAdd)
 
 pcb_t *outBlocked(pcb_t *p)
 {
+    //check:
     if (p == NULL || p->p_semAdd == NULL)
     {
         return NULL;
@@ -95,14 +104,14 @@ pcb_t *outBlocked(pcb_t *p)
     }
     else
     {
-        pcb_t *p_out = outProcQ(&(sem->s_procq), p);
-        if (p_out == NULL)
+        pcb_t *p_out = outProcQ(&(sem->s_procq), p);  //removes the process to remove
+        if (p_out == NULL)  //p not found
         {
             return NULL;
         }
         else
         {
-            if (list_empty(&(sem->s_procq)))
+            if (list_empty(&(sem->s_procq))) //if the list becomes empty the sem is deallocated
             {
                 hash_del(&(sem->s_link));
                 list_add(&(sem->s_freelink), &semdFree_h);
@@ -114,6 +123,7 @@ pcb_t *outBlocked(pcb_t *p)
 
 pcb_t *headBlocked(int *semAdd)
 {
+    //check:
     if (semAdd == NULL)
     {
         return NULL;
@@ -127,7 +137,7 @@ pcb_t *headBlocked(int *semAdd)
     }
     else
     {
-        if (list_empty(&(sem->s_procq)))
+        if (list_empty(&(sem->s_procq)))  //there are no processes blocked on sem
         {
             return NULL;
         }
@@ -138,11 +148,14 @@ pcb_t *headBlocked(int *semAdd)
         }
     }
 }
-void initASH() // testata e funziona
+
+void initASH()
 {
+    //initialization:
     INIT_LIST_HEAD(&semdFree_h);
     for (int i = 0; i < MAXPROC; i++)
     {
+        //adds to the free list of semaphores
         list_add(&semd_table[i].s_freelink, &semdFree_h);
     }
 }

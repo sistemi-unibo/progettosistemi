@@ -7,29 +7,25 @@
 #include "pcb.h"
 #include "hashtable.h"
 
-/*Inizializza tutte le liste dei namespace
-liberi. Questo metodo viene invocato
-una volta sola durante l’inizializzazione
-della struttura dati.*/
+//Function 19)
+/*sets all of the free namespaces lists.*/
 void initNamespaces();
 
-
-/*Ritorna il namespace di tipo type
-associato al processo p (o NULL).*/
+//Function 20)
+/*Returns the wanted namespace who's type is type (parameter)*/
 nsd_t *getNamespace(pcb_t *p, int type);
 
-/*Associa al processo p e a tutti I suoi
-figli il namespace ns. Ritorna FALSE in
-caso di errore, TRUE altrimenti.*/
+//Function 21)
+/*Adds ns to the namespaces of p and of all its children*/
 int addNamespace(pcb_t *p, nsd_t *ns);
 
-/*Alloca un namespace di tipo type
-dalla lista corretta.*/
+//Function 22)
+/*Allocates a namespace of type type
+from the correct list.*/
 nsd_t *allocNamespace(int type);
 
-
-/*Libera il namespace ns ri-inserendolo
-nella lista di namespace corretta.*/
+//Function 23)
+/*Frees ns and puts it back in the correct list.*/
 void freeNamespace(nsd_t *ns);
 
 
