@@ -8,102 +8,91 @@
 
 
 // pcb double linked list functions
-
 /*
-To initialize the pcbFree List:
-Function 1
-Inizializza la lista pcbFree in modo da contenere tutti gli elementi della
-pcbFree_table. Questo metodo deve essere chiamato una volta sola in fase di
-inizializzazione della struttura dati.
+Initialize the pcbFree list to contain all the elements of
+the static array of MAXPROC pcbs. This method will be
+called only once during data structure initialization
 */
 void initPcbs();
 
 /*
-pcbs which are no longer in use can be returned to the pcbFree list by
-using the method:
-Function 2
-Inserisce il PCB puntato da p nella lista
-dei PCB liberi (pcbFree_h)
+Pcbs which are no longer in use can be returned to the pcbFree list by
+using this method.
+Inserts the element pointed to by p onto the pcbFree list.
 */
 void freePcb(pcb_t *p);
 
 /*
-pcbs should be allocated by using:
-Function 3
-Restituisce NULL se la pcbFree_h è vuota. Altrimenti rimuove un elemento dalla
-pcbFree, inizializza tutti i campi (NULL/0) e restituisce l’elemento rimosso.
+Pcbs should be allocated by using this function.
+Returns NULL if the pcbFree list is empty. Otherwise, re-
+moves an element from the pcbFree list, provides initial values
+for ALL of the pcbs fields (i.e. NULL and/or 0) and then
+returns a pointer to the removed element. pcbs get reused, so
+it is important that no previous value persist in a pcb when
+it gets reallocated.
 */
 pcb_t *allocPcb();
+
 /*
 This method is used to initialize a variable to be tail pointer
 to a process queue.
-Return a pointer to the tail of an empty process queue; i.e. NULL
-Function 4
-Crea una lista di PCB, inizializzandola come lista vuota
+Creates a pcb list, initializing it as empty.
 */
 void mkEmptyProcQ(struct list_head *head);
 
 /*
-Function 5
-Restituisce TRUE se la lista puntata da head è vuota, FALSE altrimenti.
+Returns TRUE if the queue whose tail is pointed to by head is
+empty. Returns FALSE otherwise.
 */
 int emptyProcQ(struct list_head *head);
 
 /*
-Function 6
-Inserisce l’elemento puntato da p nella coda dei processi puntata da head.
+Inserts the pcb pointed by p into the process queue pointed by head.
 */
 void insertProcQ(struct list_head *head, pcb_t *p);
 
 /*
-Function 7
-Restituisce l’elemento di testa della coda dei processi da head,
-SENZA RIMUOVERLO. Ritorna NULL se la coda non ha elementi.
+Returns a pointer to the first pcb from the process queue pointed by head.
+Does not remove this pcb from the process queue. 
+Returns NULL if the process queue is empty.
 */
 pcb_t *headProcQ(struct list_head *head);
 
 /*
-Function 8
-Rimuove il primo elemento dalla coda dei processi puntata da head. Ritorna NULL se la
-coda è vuota. Altrimenti ritorna il puntatore all’elemento rimosso dalla lista.
+Removes the first pcb from the process queue pointed by head.
+Return NULL if the queue is empty.
+Otherwise returns the pointer of the removed pcb.
 */
 pcb_t *removeProcQ(struct list_head *head);
 
 /*
-Function 9
-Rimuove il PCB puntato da p dalla coda dei processi puntata da head. Se p non è presente
-nella coda, restituisce NULL. (NOTA: p può trovarsi in una posizione arbitraria della coda).
+Removes the pcb pointed by p from the process queue pointed by head.
+Return NULL if the process is not in the queue.
 */
 pcb_t *outProcQ(struct list_head *head, pcb_t *p);
-
-
 
 // pcb double linked tree functions
 
 /*
-Function 10
-Restituisce TRUE se il PCB puntato da p non ha figli, FALSE altrimenti.
+Returns TRUE if the pcb pointed by p doesn't have children, FALSE otherwise.
 */
 int emptyChild(pcb_t *p);
 
 /*
-Function 11
-Inserisce il PCB puntato da p come figlio del PCB puntato da prnt
+Inserts the pcb pointed by p as son of the pcb pointed by prnt
 */
 void insertChild(pcb_t *prnt, pcb_t *p);
 
 /*
-Function 12
-Rimuove il primo figlio del PCB puntato da p. Se p non ha figli, restituisce NULL
+Removes the first child of the pcb pointed by p.
+Returns NULL if p doen't have children.
 */
 pcb_t *removeChild(pcb_t *p);
 
 /*
-Function 13
-Rimuove il PCB puntato da p dalla lista dei figli del padre. Se il PCB puntato da
-p non ha un padre, restituisce NULL, altrimenti restituisce l’elemento
-rimosso (cioè p). A differenza della removeChild, p può trovarsi in una
-posizione arbitraria (ossia non è necessariamente il primo figlio del padre)
+Removes the pcb pointed by p from the list of the father's children.
+Returns NULL if the pcb pointed by p doesn't have a father, 
+otherwise returns p.
 */
 pcb_t *outChild(pcb_t *p);
 

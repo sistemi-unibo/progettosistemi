@@ -3,32 +3,38 @@
 static pcb_t pcbFree_table[MAXPROC];
 
 static struct list_head pcbFree_h;
-void initPcbs() //ok
+void initPcbs()
 {
+    //initialisation:
     INIT_LIST_HEAD(&pcbFree_h);
+    //cycles over the pcb array and inserts every element into the list
     for (int i = 0; i < MAXPROC; i++)
     {
         list_add(&pcbFree_table[i].p_list, &pcbFree_h);
     }
 }
 
-void freePcb(pcb_t *p) //ok
+void freePcb(pcb_t *p) 
 {
     list_add_tail(&(p->p_list), &pcbFree_h);
 }
 
 
-pcb_t *allocPcb() //ok
+pcb_t *allocPcb()
 {
+    //checks if the free pcb's list is empty
     if (list_empty(&pcbFree_h))
     {
         return NULL;
     }
     else
     {
+        //deletes the first pcb from the free pcb's list
         struct list_head *new = pcbFree_h.next;
         list_del(pcbFree_h.next);
         pcb_t *pcb = container_of(new, pcb_t, p_list);
+
+        //sets every parameter of the pcb's struct to NULL or 0
         pcb->p_list.next = NULL;
         pcb->p_list.prev = NULL;
         pcb->p_parent = NULL;
@@ -55,38 +61,36 @@ pcb_t *allocPcb() //ok
     }
 }
 
-void mkEmptyProcQ(struct list_head *head) //ok
+void mkEmptyProcQ(struct list_head *head) 
 {
+    //checks if the pointer is null, if not, it initilizes it to null
     if (head != NULL)
     {
-        INIT_LIST_HEAD(head); // se head==NULL, non fa nulla; se head è diverso da NULL, usa la funzione INIT_LIST_HEAD (definita dal prof in list.h), che prendendo in input "head" (l'elemento sentinella), la inizializza impostando i puntatori avanti e indietro in modo che puntino all'elemento sentinella stesso (perché per ora la lista è vuota, c'è solo l'elemento sentinella head)
+        INIT_LIST_HEAD(head); 
     }
 }
 
-int emptyProcQ(struct list_head *head) //ok
+int emptyProcQ(struct list_head *head)
 {
     if (head == NULL)
     {
-        return true; // se non esiste head, l'elemento sentinella, la lista è vuota.
+        return true; 
     }
-
-    return (list_empty(head)); // "list_empty" è la funzione data dal prof in "list.h" che abbiamo usato anche nella funzione "allocPcb" che controlla se head->next è uguale a head (in tal caso nella lista è presente solo la sentinella head, quindi la lista è di fatto vuota)
+    //returns true if the list pointed by head is null
+    return (list_empty(head)); 
 }
 
-void insertProcQ(struct list_head *head, pcb_t *p) //ok
+void insertProcQ(struct list_head *head, pcb_t *p) 
 {
     if (head != NULL && p != NULL)
     {
+        //inserts pcb by tail
+        list_add_tail(&p->p_list, head); 
+        
+    } 
+}
 
-        list_add_tail(&p->p_list, head); // "list_add_tail" prende come parametro due tipi "list_head*":
-        //"head" è di tipo "list_head*", quindi posso passarglielo come parametro,
-        // mentre "p" è di tipo "pcb_t*", che è il puntatore a una struct che contiene altre struct,
-        // tra cui "list_head". L'elemento di tipo "list_head", all'interno di "p", si chiama "p_list",
-        // quindi come parametro a "list_add_tail" passo "p->p_list"
-    } // la soluzione di foxy mette &p->p_list a riga 66, ma non ho capito la motivazione ("list_add_tail" prende come parametri due puntatori a "list_head")
-} // inoltre Foxy mette prima di "list_add_tail" una funzione creata da lui chiamata "list_sdel", definita nel suo file "util.h", che a quanto ho capito elimina i rapporti (prev e next) che p aveva nella pcbfreetable (DI QUESTA COSA NON SONO SICURO)
-
-pcb_t *headProcQ(struct list_head *head) //ok
+pcb_t *headProcQ(struct list_head *head) 
 {
     if (head == NULL || list_empty(head))
     {
@@ -94,12 +98,12 @@ pcb_t *headProcQ(struct list_head *head) //ok
     }
     else
     {
-        return container_of(head->next, pcb_t, p_list); // container_of: estrae un membro di una struct da quest'ultima. Prende come paraemtro: un puntatore al membro della struct da estrarre, il tipo della struttura che contiene il membro da estrarre; il nome del membro della struct che devo estrarre
-                                                        //  Foxy usa "list_next(head)", definita in list.h. (A quanto ho capito "list_next" dato un puntatore a un elemento della lista, restituisce il next)
+        //returns pcb pointed to by head->next
+        return container_of(head->next, pcb_t, p_list);                                  
     }
 }
 
-pcb_t *removeProcQ(struct list_head *head) //ok
+pcb_t *removeProcQ(struct list_head *head) 
 {
     if (head == NULL || list_empty(head))
     {
@@ -107,13 +111,14 @@ pcb_t *removeProcQ(struct list_head *head) //ok
     }
     else
     {
+        //removes and returns pcb pointed to by head->next
         struct list_head *p = head->next;
         list_del(head->next);
         return container_of(p, pcb_t, p_list);
     }
 }
 
-pcb_t *outProcQ(struct list_head *head, pcb_t *p) //ok
+pcb_t *outProcQ(struct list_head *head, pcb_t *p)
 {
     if (head == NULL || list_empty(head))
     {
@@ -122,6 +127,7 @@ pcb_t *outProcQ(struct list_head *head, pcb_t *p) //ok
     else
     {
         struct list_head *x;
+        //searches for p in the list whose head is head
         list_for_each(x, head)
         {
             if (container_of(x, pcb_t, p_list) == p)
@@ -131,29 +137,33 @@ pcb_t *outProcQ(struct list_head *head, pcb_t *p) //ok
             }
         }
     }
-    return NULL; // non ha trovato il pcb
+    return NULL; 
 }
 
-int emptyChild(pcb_t *p) //ok
+// pcb double linked tree functions
+
+int emptyChild(pcb_t *p) 
 {
     if (p == NULL)
     {
         return true;
     }
 
-    return list_empty(&p->p_child); // list_empty controlla se "p->p_child" punta a "p": se sì vuol dire che p non ha figli e il puntatore che da "p" va ai figli, torna indietro; se "p->child" punta a qualcosa di diverso da p, vuol dire che p ha dei figli e quindi "list_empty" ritorna "false"
+    //if p has no children returns true, false otherwise
+    return list_empty(&p->p_child); 
 }
 
-void insertChild(pcb_t *prnt, pcb_t *p) //ok
+void insertChild(pcb_t *prnt, pcb_t *p)
 {
     if (prnt != NULL && p != NULL)
     {
+        //sets prnt as p's parent, and adds p's siblings list to the parent's children list
         p->p_parent = prnt;
         list_add_tail(&p->p_sib, &prnt->p_child);
     }
 }
 
-pcb_t *removeChild(pcb_t *p) //ok
+pcb_t *removeChild(pcb_t *p) 
 {
     if (list_empty(&p->p_child) || p == NULL)
     {
@@ -161,13 +171,14 @@ pcb_t *removeChild(pcb_t *p) //ok
     }
     else
     {
+        //deletes first child and returns it
         struct list_head *tmp = (&p->p_child)->next;
         list_del((&p->p_child)->next);
         return container_of(tmp, pcb_t, p_sib);
     }
 }
 
-pcb_t *outChild(pcb_t *p) //ok
+pcb_t *outChild(pcb_t *p) 
 {
     if (p == NULL || p->p_parent == NULL )
     {
@@ -175,6 +186,7 @@ pcb_t *outChild(pcb_t *p) //ok
     }
     else
     {
+        //sets p's parent pointer to null and deletes him from the sibling's list
         p->p_parent = NULL;
         list_del(&p->p_sib);
         
