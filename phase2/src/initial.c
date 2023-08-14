@@ -4,7 +4,7 @@
 #include "include/pandos_const.h"
 #include "include/pandos_types.h"
 #include "include/types.h"
-
+#define NUM_SEMAPHORES (DEVINTNUM*2)
 int main(){
     
     //initialize phase 1 data structures
@@ -22,9 +22,15 @@ int main(){
 
     pcb_t *currentProcess = NULL; //current active process
 
-    // da inizializzare: Un semaforo (e.g. una variabile int) per ogni
-    //(sub) dispositivo. Non necessariamente tutti
-    //questi semafori sono sempre attivi.
+    // DA CONTROLLARE
+
+    int subDeviceSemaphores[NUM_SEMAPHORES]; //array of semaphores for each subdevice
     
+    //pass up vector initialization
+    // gli indirizzi di memoria menzionati si trovano già in pandos_const.h
+    // PASSUPVECTOR e KERNELSTACK
+
+    
+
     return 0;
 }
