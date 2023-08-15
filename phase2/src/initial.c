@@ -5,6 +5,7 @@
 #include "include/pandos_types.h"
 #include "include/types.h"
 #include "include/exception.h"
+#include <umps/libumps.h>
 
 //da controllare
 #define NUM_SEMAPHORES (DEVINTNUM+1) * DEVPERINT +1
@@ -43,5 +44,26 @@ int main(){
     puv->exception_handler = (memaddr) exceptionHandler;
     puv->exception_stackPtr = (memaddr) KERNELSTACK;
 
+    LDIT(100000); //set timer to 100ms
+
+    //alloc single process ...
+
+    pcb_PTR proc = allocPcb();
+    processCount++;
+    //interrupts enabled, process local timer enabled, kernel mode on, 
+    //SP set to RAMTOP, PC set to the address of test
+
+    //state initialization
+    state_t procState;
+    STST(&procState);
+
+    //set stack pointer to RAMTOP
+    
+
+
+
+
+
+    insertProcQ(&readyQueue, proc);
     return 0;
 }
