@@ -4,13 +4,20 @@
 #include "include/pandos_const.h"
 #include "include/pandos_types.h"
 #include "include/types.h"
-#define NUM_SEMAPHORES (DEVINTNUM*2)
+#include "include/exception.h"
+
+//da controllare
+#define NUM_SEMAPHORES (DEVINTNUM+1) * DEVPERINT +1
+
+extern void uTLB_RefillHandler();
+
+
 int main(){
     
     //initialize phase 1 data structures
     initPcbs();
     initASH();
-    initNS();
+    initNamespaces();
 
     //initialize variables
 
@@ -30,7 +37,11 @@ int main(){
     // gli indirizzi di memoria menzionati si trovano già in pandos_const.h
     // PASSUPVECTOR e KERNELSTACK
 
-    
+    passupvector_t *puv = (passupvector_t *) PASSUPVECTOR;
+    puv->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
+    puv->tlb_refill_stackPtr = (memaddr) KERNELSTACK;
+    puv->exception_handler = (memaddr) exceptionHandler;
+    puv->exception_stackPtr = (memaddr) KERNELSTACK;
 
     return 0;
 }

@@ -20,7 +20,8 @@
     "utility": "c",
     "ns.h": "c",
     "ash.h": "c",
-    "types.h": "c"
+    "types.h": "c",
+    "exception.h": "c"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
