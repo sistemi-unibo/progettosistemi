@@ -95,7 +95,15 @@ int main(){
     i vari valori sono definiti in pandos_const.h
     del tipo
     procState.status = ALLOFF | etc...
-    con le varie macro definite ma al momento nella documentazione non trovo il significato di ognuna di esse
+    sono ancora molto confusa da tutto ciò
+    Status register constants
+    #define ALLOFF      0x00000000     bit 0 (0000), IEc, global interrupt enable bit, when 0 all interrupts are disabled
+    #define USERPON     0x00000008     bit 4 (1000)
+    #define IEPON       0x00000004     bit 3 (0100)
+    #define IECON       0x00000001     bit 0 (0001), IEc, when 1 interrupts on
+    #define IMON        0x0000FF00     (1*8 0*8), IM, interrupt mask
+    #define TEBITON     0x08000000     
+    #define DISABLEINTS 0xFFFFFFFE
     */
     
     //interrupts enabled, process local timer enabled, kernel mode on
