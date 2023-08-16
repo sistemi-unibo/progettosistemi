@@ -4,13 +4,14 @@
 #include "include/pandos_const.h"
 #include "include/pandos_types.h"
 #include "include/types.h"
-#include "include/exception.h"
+#include "include/exceptions.h"
 #include <umps/libumps.h>
 
 //da controllare
 #define NUM_SEMAPHORES (DEVINTNUM+1) * DEVPERINT +1
 
 extern void uTLB_RefillHandler();
+extern void test();
 
 
 int main(){
@@ -41,6 +42,7 @@ int main(){
     passupvector_t *puv = (passupvector_t *) PASSUPVECTOR;
     puv->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
     puv->tlb_refill_stackPtr = (memaddr) KERNELSTACK;
+    //da implementare exceptionHandler
     puv->exception_handler = (memaddr) exceptionHandler;
     puv->exception_stackPtr = (memaddr) KERNELSTACK;
 
@@ -50,19 +52,57 @@ int main(){
 
     pcb_PTR proc = allocPcb();
     processCount++;
-    //interrupts enabled, process local timer enabled, kernel mode on, 
-    //SP set to RAMTOP, PC set to the address of test
+    /* Processor state 
+    typedef struct state {
+        unsigned int entry_hi;  no idea
+        unsigned int cause;   cause register, contiene i bit di causa dell'eccezione
+        unsigned int status;  status register, contiene i bit di stato del processore
+        unsigned int pc_epc;   program counter register, contiene l'indirizzo della prossima istruzione da eseguire
+        unsigned int gpr[STATE_GPR_LEN];  gpr -> general purpose registers, è l'array in cui si trovano i registri
+        unsigned int hi;
+        unsigned int lo;  two special registers used to hold the results of multiplication and division
+        
+    } state_t;
+    */
 
     //state initialization
     state_t procState;
     STST(&procState);
 
-    //set stack pointer to RAMTOP
+    /*
+    state_t.gpr[reg_sp] //stack pointer register
+    controllare file types per verificare registro corretto
+    per come sono dichiarati i registri, non bisogna scrivere gpr[reg_sp]
+    ma direttamente il registro
+    esempio:
+    #define reg_sp  gpr[26]
+    */
+    //stack pointer set to RAMTOP
+    RAMTOP(procState.reg_sp);
+    
+    /*
+    un tipo assegna anche procState.reg_t9 = (memaddr) test;
+    reg_t9 sarebbe gpr[24], non so che registro rappresenti
+    program counter set to test
+    anche nei file di test setta i registri t9 e pc_epc sempre assieme
+    esempio:
+    hp_p1state.pc_epc = hp_p1state.reg_t9 = (memaddr)hp_p1;
+    */
+    procState.pc_epc = (memaddr) test;
+
+    /*
+    queste cose si settano attraverso lo status register
+    i vari valori sono definiti in pandos_const.h
+    del tipo
+    procState.status = ALLOFF | etc...
+    con le varie macro definite ma al momento nella documentazione non trovo il significato di ognuna di esse
+    */
+    
+    //interrupts enabled, process local timer enabled, kernel mode on
     
 
-
-
-
+    //set stack pointer to RAMTOP
+    
 
     insertProcQ(&readyQueue, proc);
     return 0;
