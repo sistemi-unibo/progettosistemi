@@ -142,6 +142,9 @@ int main()
     // interrupts enabled, process local timer enabled, kernel mode on
     procState.status = ALLOFF | IEPON | IMON | TEBITON;
 
+    //the processor state structure is set to our created state
+    proc->p_s = procState;
+
     // set all tree fields to  NULL
     proc->p_parent = NULL;
     INIT_LIST_HEAD(&proc->p_child);
