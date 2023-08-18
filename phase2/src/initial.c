@@ -4,11 +4,12 @@
 #include "include/pandos_const.h"
 #include "include/pandos_types.h"
 #include "include/types.h"
+#include "scheduler.h"
 #include "include/exceptions.h"
 #include <umps/libumps.h>
 
 // da controllare
-#define NUM_SEMAPHORES (DEVINTNUM + 1) * DEVPERINT + 1
+
 
 extern void uTLB_RefillHandler();
 extern void test();

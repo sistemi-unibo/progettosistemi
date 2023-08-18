@@ -21,7 +21,8 @@
     "ns.h": "c",
     "ash.h": "c",
     "types.h": "c",
-    "exception.h": "c"
+    "exception.h": "c",
+    "scheduler.h": "c"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
