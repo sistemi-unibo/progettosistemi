@@ -7,52 +7,84 @@
 #include "include/exceptions.h"
 #include <umps/libumps.h>
 
-//da controllare
-#define NUM_SEMAPHORES (DEVINTNUM+1) * DEVPERINT +1
+// da controllare
+#define NUM_SEMAPHORES (DEVINTNUM + 1) * DEVPERINT + 1
 
 extern void uTLB_RefillHandler();
 extern void test();
 
+void nullifySupport_t(support_t *p_supportStruct)
+{
+    p_supportStruct->sup_asid = 0;
+    for (int i = 0; i < 2; i++)
+    {
+        p_supportStruct->sup_exceptState[i].cause = 0;
+        p_supportStruct->sup_exceptState[i].entry_hi = 0;
+        for (int j = 0; j < 30; j++)
+        {
+            p_supportStruct->sup_exceptState[i].gpr[j] = 0;
+        }
+        p_supportStruct->sup_exceptState[i].hi = 0;
+        p_supportStruct->sup_exceptState[i].lo = 0;
+        p_supportStruct->sup_exceptState[i].pc_epc = 0;
+        p_supportStruct->sup_exceptState[i].status = 0;
 
-int main(){
-    
-    //initialize phase 1 data structures
+        p_supportStruct->sup_exceptContext[i].pc = 0;
+        p_supportStruct->sup_exceptContext[i].status = 0;
+        p_supportStruct->sup_exceptContext[i].stackPtr = 0;
+    }
+    for (int k = 0; k < MAXPAGES; k++)
+    {
+        p_supportStruct->sup_privatePgTbl[k].pte_entryHI = 0;
+        p_supportStruct->sup_privatePgTbl[k].pte_entryLO = 0;
+    }
+}
+
+int main()
+{
+
+    // initialize phase 1 data structures
     initPcbs();
     initASH();
     initNamespaces();
 
-    //initialize variables
+    // initialize variables
 
-    int processCount = 0; //number of alive processes
-    int softBlockCount = 0; //number of processes in soft block
+    int processCount = 0;   // number of alive processes
+    int softBlockCount = 0; // number of processes in soft block
 
-    static struct list_head readyQueue; 
-    mkEmptyProcQ(&readyQueue); //ready queue processes
+    static struct list_head readyQueue;
+    mkEmptyProcQ(&readyQueue); // ready queue processes
 
-    pcb_t *currentProcess = NULL; //current active process
+    pcb_t *currentProcess = NULL; // current active process
 
     // DA CONTROLLARE
 
-    int subDeviceSemaphores[NUM_SEMAPHORES]; //array of semaphores for each subdevice
-    
-    //pass up vector initialization
-    // gli indirizzi di memoria menzionati si trovano già in pandos_const.h
-    // PASSUPVECTOR e KERNELSTACK
+    // semaphores initialization
+    int subDeviceSemaphores[NUM_SEMAPHORES]; // array of semaphores for each subdevice
+    for (int i = 0; i < NUM_SEMAPHORES; i++)
+    {
+        subDeviceSemaphores[i] = 0;
+    }
 
-    passupvector_t *puv = (passupvector_t *) PASSUPVECTOR;
-    puv->tlb_refill_handler = (memaddr) uTLB_RefillHandler;
-    puv->tlb_refill_stackPtr = (memaddr) KERNELSTACK;
-    //da implementare exceptionHandler
-    puv->exception_handler = (memaddr) exceptionHandler;
-    puv->exception_stackPtr = (memaddr) KERNELSTACK;
+    // pass up vector initialization
+    //  gli indirizzi di memoria menzionati si trovano già in pandos_const.h
+    //  PASSUPVECTOR e KERNELSTACK
 
-    LDIT(100000); //set timer to 100ms
+    passupvector_t *puv = (passupvector_t *)PASSUPVECTOR;
+    puv->tlb_refill_handler = (memaddr)uTLB_RefillHandler;
+    puv->tlb_refill_stackPtr = (memaddr)KERNELSTACK;
+    // da implementare exceptionHandler
+    puv->exception_handler = (memaddr)exceptionHandler;
+    puv->exception_stackPtr = (memaddr)KERNELSTACK;
 
-    //alloc single process ...
+    LDIT(100000); // set timer to 100ms
+
+    // alloc single process ...
 
     pcb_PTR proc = allocPcb();
     processCount++;
-    /* Processor state 
+    /* Processor state
     typedef struct state {
         unsigned int entry_hi;  no idea
         unsigned int cause;   cause register, contiene i bit di causa dell'eccezione
@@ -61,11 +93,11 @@ int main(){
         unsigned int gpr[STATE_GPR_LEN];  gpr -> general purpose registers, è l'array in cui si trovano i registri
         unsigned int hi;
         unsigned int lo;  two special registers used to hold the results of multiplication and division
-        
+
     } state_t;
     */
 
-    //state initialization
+    // state initialization
     state_t procState;
     STST(&procState);
 
@@ -77,18 +109,19 @@ int main(){
     esempio:
     #define reg_sp  gpr[26]
     */
-    //stack pointer set to RAMTOP
+    // stack pointer set to RAMTOP
     RAMTOP(procState.reg_sp);
-    
+
     /*
-    un tipo assegna anche procState.reg_t9 = (memaddr) test;
+    da controllare anche procState.reg_t9 = (memaddr) test;
     reg_t9 sarebbe gpr[24], non so che registro rappresenti
     program counter set to test
     anche nei file di test setta i registri t9 e pc_epc sempre assieme
     esempio:
     hp_p1state.pc_epc = hp_p1state.reg_t9 = (memaddr)hp_p1;
     */
-    procState.pc_epc = (memaddr) test;
+    // program counter settato a test
+    procState.pc_epc = procState.reg_t9 = (memaddr)test;
 
     /*
     queste cose si settano attraverso lo status register
@@ -97,20 +130,31 @@ int main(){
     procState.status = ALLOFF | etc...
     sono ancora molto confusa da tutto ciò
     Status register constants
-    #define ALLOFF      0x00000000     bit 0 (0000), IEc, global interrupt enable bit, when 0 all interrupts are disabled
+    #define ALLOFF      0x00000000
     #define USERPON     0x00000008     bit 4 (1000)
-    #define IEPON       0x00000004     bit 3 (0100)
-    #define IECON       0x00000001     bit 0 (0001), IEc, when 1 interrupts on
+    #define IEPON       0x00000004     bit 3 (0100) global interrupt enable bit
+    #define IECON       0x00000001
     #define IMON        0x0000FF00     (1*8 0*8), IM, interrupt mask
-    #define TEBITON     0x08000000     
+    #define TEBITON     0x08000000
     #define DISABLEINTS 0xFFFFFFFE
     */
-    
-    //interrupts enabled, process local timer enabled, kernel mode on
-    
 
-    //set stack pointer to RAMTOP
-    
+    // interrupts enabled, process local timer enabled, kernel mode on
+    procState.status = ALLOFF | IEPON | IMON | TEBITON;
+
+    // set all tree fields to  NULL
+    proc->p_parent = NULL;
+    INIT_LIST_HEAD(&proc->p_child);
+    INIT_LIST_HEAD(&proc->p_sib);
+
+    // p_time to 0
+    proc->p_time = 0;
+
+    // p_semadd to NULL
+    proc->p_semAdd = NULL;
+
+    // support_t initialized
+    nullifySupport_t(proc->p_supportStruct);
 
     insertProcQ(&readyQueue, proc);
     return 0;
