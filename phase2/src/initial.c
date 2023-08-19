@@ -6,7 +6,7 @@
 #include "include/types.h"
 #include "scheduler.h"
 #include "include/exceptions.h"
-#include <umps/libumps.h>
+
 
 // da controllare
 
@@ -54,8 +54,8 @@ int main()
     int processCount = 0;   // number of alive processes
     int softBlockCount = 0; // number of processes in soft block
 
-    static struct list_head readyQueue;
-    mkEmptyProcQ(&readyQueue); // ready queue processes
+    static struct list_head *readyQueue;
+    mkEmptyProcQ(readyQueue); // ready queue processes
 
     pcb_t *currentProcess = NULL; // current active process
 
@@ -160,6 +160,10 @@ int main()
     // support_t initialized
     nullifySupport_t(proc->p_supportStruct);
 
-    insertProcQ(&readyQueue, proc);
+    //nel caso non funzioni fare proc->p_supportStruct = NULL
+
+    insertProcQ(readyQueue, proc);
+
+    scheduler();
     return 0;
 }
