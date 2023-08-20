@@ -75,7 +75,6 @@ int main()
     passupvector_t *puv = (passupvector_t *)PASSUPVECTOR;
     puv->tlb_refill_handler = (memaddr)uTLB_RefillHandler;
     puv->tlb_refill_stackPtr = (memaddr)KERNELSTACK;
-    // da implementare exceptionHandler
     puv->exception_handler = (memaddr)exceptionHandler;
     puv->exception_stackPtr = (memaddr)KERNELSTACK;
 
