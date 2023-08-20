@@ -33,15 +33,27 @@ void exceptionHandler()
     }
 }
 
-void passupordie(int index)
+void passupordie(int index, state_t *exceptionState) //pag 22-23 phase2.book
 {
     //ricontrollare la &
     if (&(currentProcess->p_supportStruct) == NULL)
     {
-        //probabilmente sbagliata
-        terminate_process();
-
+        //probabilmente sbagliata 
+        terminate_process(); 
         //SYSCALL(2, &(currentProcess->p_pid), 0,0);
+    }
+    else{
+        /* Copio lo stato del processo che ha causato l'eccezione nella support struct */
+        copyState(exceptionState, &(currentProcess->p_supportStruct->sup_exceptState[index]));
+
+        /* Salvo il valore dello stack pointer, dello status e del program counter nelle variabili*/
+        unsigned int stackPointer =currentProcess->p_supportStruct->sup_exceptContext[index].c_stackPtr;
+        unsigned int status = currentProcess->p_supportStruct->sup_exceptContext[index].c_status;
+        unsigned int pcounter = currentProcess->p_supportStruct->sup_exceptContext[index].c_pc;
+
+        /* Eseguo la macro che gestisce l'eccezione (penso passandola a un livello superiore) */
+        LDCXT(stackPointer, status, pcounter);
+
     }
     
 }
@@ -57,6 +69,12 @@ void syscallHandler() {
     //la and tra lo status register dell'exceptionstate e userpon dee fare 0 se il processo è in kernel mode e diverso se è in user mode
     if(exceptionState->status & USERPON != ALLOFF){
         //sets the Cause.ExcCode a RI (reserved instruction) e poi chiama l'exception handler
+
+        /* modifiche fatte da Manu da valutare insieme
+        exceptionState->cause |= (RI<<CAUSESHIFT); // modifico il campo "cause" di "exceptionState" in modo da indicare che è stata generata un'eccezione RI. Come? Facendo OR bit a bit tra il valore del campo cause e il valore RI (che è semplcemente un flag per le eccezioni RI): così facendo nel campo cause metto a 1 i bit che mi indicano che sto trattando una eccezione RI
+        passupordie(GENERALEXCEPT, exceptionState); //chiamo l'exception handler e penserà lui a gestire l'eccezione. Gli fornisco come parametri la struttura exceptionState e "GENERALEXCEPT" non ho capito di preciso cos'è, ma in teoria gli dovrei passare (per come è definita passupordie) un intero che mi differenzia tra TLB refill e Program Trap. edit: le dispense dicono di chiamare l'exception handler per program trap e nella funzione "exceptionHandler" nella sezione dello switch dei program trap, abbiamo dato come parametro a passupordie sempre "GENERALEXCEPT"
+        */
+
     }
 
     //else se è in kernel mode:
