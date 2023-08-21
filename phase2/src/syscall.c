@@ -8,7 +8,7 @@ extern struct list_head *readyQueue;
 int createProcess (state_t *statep, support_t *supportp, nsd_t *ns){
     pcb_t *newProcess = allocPcb();
     if (newProcess == NULL) {
-        &(statep->reg_v0) = NOPROC;
+        statep->reg_v0 = NOPROC;
         LDST(statep);
     } else {
         //inserting new process in the process queue 
@@ -27,14 +27,20 @@ int createProcess (state_t *statep, support_t *supportp, nsd_t *ns){
 
         newProcess->p_time = 0;
         newProcess->p_semAdd = NULL;
-
-        newProcess->namespaces = ns;
-
+    
+        if( ns != NULL){
+            //addNs ritorna TRUE o FALSE, da controllare
+            addNamespace(newProcess, ns);
+        } else{
+            //eredita i namespace del padre
+            for(int i=0 ; i < NS_TYPE_MAX; i++){
+                addNamespace(newProcess, currentProcess->namespaces[i]);
+            }
+        }
         LDST(statep);
     }
 
     return newProcess->p_pid;
-    
 }
 
 
@@ -47,12 +53,12 @@ void terminateProcess(int pid){
         terminateProc = currentProcess;
     } else {
 
-        terminateProc = searchProc(id, readyQueue);
+        terminateProc = searchProc(pid, readyQueue);
     }
 
     if(emptyChild(terminateProc)){
         outChild(terminateProc);
-        freePcb(terminateProc):
+        freePcb(terminateProc);
         currentProcess--;
     } else {
 
@@ -62,24 +68,35 @@ void terminateProcess(int pid){
     scheduler();
 }
 
-void killChildren(pcb_t proc){
+void killChildren(pcb_t *proc){
 
-    //non ha figli, uccido processo
+    
     if (emptyChild(proc))
     {
-        /* code */
+        //non ha figli, uccido processo
+        //primo punto, rimuovo proc dalla lista dei figli del padre
+        outChild(proc);
+        //svariati altri punti...
+        
     } else {
-    // ha figli, chiamata ricorsiva
+    // ha figli, chiamata ricorsiva su di essi
         while(!emptyChild(proc)){
-            pcb_t child1 = proc.p_child;
-            killChildren(   );
+            /*
+            DA CONTROLLARE
+            bisogna passare il figlio di proc alla funzione killChildren
+            ma proc->p_child è di tipo list_head, la funzione vuole pcb_t
+            sono estremamente dubbiosa del funzionamento di questo container of
+            */
+            pcb_t *passChild = container_of(proc, pcb_t, p_child);
+
+            killChildren(passChild);
         }
     }
     
 
 }
 
-pcb_t searchProc(int pid, list_head *procQueue){
+pcb_t *searchProc(int pid, struct list_head *procQueue){
 
     pcb_t *returnProc = NULL;
     struct list_head *x;

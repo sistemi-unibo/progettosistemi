@@ -27,6 +27,6 @@
     "syscall.h": "c",
     "exceptions.h": "c",
     "container_of.h": "c"
-  },
-  "C_Cpp.errorSquiggles": "disabled"
+  }
+
 }
