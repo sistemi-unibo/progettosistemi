@@ -23,7 +23,9 @@
     "types.h": "c",
     "exception.h": "c",
     "scheduler.h": "c",
-    "libumps.h": "c"
+    "libumps.h": "c",
+    "syscall.h": "c",
+    "exceptions.h": "c"
   },
-  "C_Cpp.errorSquiggles": "enabled"
+  "C_Cpp.errorSquiggles": "disabled"
 }

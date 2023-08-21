@@ -4,4 +4,9 @@
 #include "pcb.h"
 #include <umps/libumps.h>
 #include "scheduler.h"
+#include "syscall.h"
+
 void exceptionHandler();
+void passupordie(int index, state_t *exceptionState);
+void syscallHandler(state_t *exceptionState);
+void copyOfState(state_t* source, state_t* dest);
