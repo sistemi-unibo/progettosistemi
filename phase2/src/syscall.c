@@ -33,5 +33,65 @@ int createProcess (state_t *statep, support_t *supportp, nsd_t *ns){
         LDST(statep);
     }
 
+    return newProcess->p_pid;
     
+}
+
+
+//controllare caso in cui searchProc restituisce NULL 
+//(nessun proc con id = pid trovato)
+void terminateProcess(int pid){
+    pcb_t *terminateProc = NULL;
+
+    if ( pid == 0){
+        terminateProc = currentProcess;
+    } else {
+
+        terminateProc = searchProc(id, readyQueue);
+    }
+
+    if(emptyChild(terminateProc)){
+        outChild(terminateProc);
+        freePcb(terminateProc):
+        currentProcess--;
+    } else {
+
+        killChildren(terminateProc);
+    }
+
+    scheduler();
+}
+
+void killChildren(pcb_t proc){
+
+    //non ha figli, uccido processo
+    if (emptyChild(proc))
+    {
+        /* code */
+    } else {
+    // ha figli, chiamata ricorsiva
+        while(!emptyChild(proc)){
+            pcb_t child1 = proc.p_child;
+            killChildren(   );
+        }
+    }
+    
+
+}
+
+pcb_t searchProc(int pid, list_head *procQueue){
+
+    pcb_t *returnProc = NULL;
+    struct list_head *x;
+        
+        list_for_each(x, procQueue)
+        {
+            if (container_of(x, pcb_t, p_list)->p_pid == pid)
+            {
+                returnProc = container_of(x, pcb_t, p_list);
+            }
+        }
+
+    return returnProc;
+
 }

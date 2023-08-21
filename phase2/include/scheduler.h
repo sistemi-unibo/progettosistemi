@@ -4,3 +4,6 @@
 #include "pcb.h"
 #include <umps/libumps.h>
 #define NUM_SEMAPHORES (DEVINTNUM + 1) * DEVPERINT + 1
+
+int check_case();
+void scheduler();
