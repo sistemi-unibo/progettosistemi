@@ -1,6 +1,9 @@
-#pragma once
+#ifndef SYSCALL_H
+#define SYSCALL_H
+
 #include "exceptions.h"
 #include "ns.h"
+#include "ash.h"
 
 /*
 First system call:
@@ -23,3 +26,5 @@ void killChildren(pcb_t *proc);
 Searches for a process with a given pid in a given queue
 */
 pcb_t *searchProc(int pid, struct list_head *procQueue);
+
+#endif

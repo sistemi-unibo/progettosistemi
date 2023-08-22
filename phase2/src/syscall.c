@@ -4,36 +4,44 @@ extern int processCount;
 extern pcb_t *currentProcess;
 extern struct list_head *readyQueue;
 
-//da controllare i vari casi in cui i parametri sono NULL e i casting
-int createProcess (state_t *statep, support_t *supportp, nsd_t *ns){
+// da controllare i vari casi in cui i parametri sono NULL e i casting
+int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
+{
     pcb_t *newProcess = allocPcb();
-    if (newProcess == NULL) {
+    if (newProcess == NULL)
+    {
         statep->reg_v0 = NOPROC;
         LDST(statep);
-    } else {
-        //inserting new process in the process queue 
+    }
+    else
+    {
+        // inserting new process in the process queue
         insertProcQ(readyQueue, newProcess);
 
         processCount++;
 
         insertChild(currentProcess, newProcess);
 
-        //da controllare, forse va fatto casting
+        // da controllare, forse va fatto casting
         copyOfState(statep->reg_a1, &(newProcess->p_s));
-        //da controllare, forse va fatto casting
-        // da controllare come mai passiamo supportp come parametro
-        //ma non viene utilizzato
+        // da controllare, forse va fatto casting
+        //  da controllare come mai passiamo supportp come parametro
+        // ma non viene utilizzato
         newProcess->p_supportStruct = statep->reg_a2;
 
         newProcess->p_time = 0;
         newProcess->p_semAdd = NULL;
-    
-        if( ns != NULL){
-            //addNs ritorna TRUE o FALSE, da controllare
+
+        if (ns != NULL)
+        {
+            // addNs ritorna TRUE o FALSE, da controllare
             addNamespace(newProcess, ns);
-        } else{
-            //eredita i namespace del padre
-            for(int i=0 ; i < NS_TYPE_MAX; i++){
+        }
+        else
+        {
+            // eredita i namespace del padre
+            for (int i = 0; i < NS_TYPE_MAX; i++)
+            {
                 addNamespace(newProcess, currentProcess->namespaces[i]);
             }
         }
@@ -43,24 +51,30 @@ int createProcess (state_t *statep, support_t *supportp, nsd_t *ns){
     return newProcess->p_pid;
 }
 
-
-//controllare caso in cui searchProc restituisce NULL 
+// controllare caso in cui searchProc restituisce NULL
 //(nessun proc con id = pid trovato)
-void terminateProcess(int pid){
+void terminateProcess(int pid)
+{
     pcb_t *terminateProc = NULL;
 
-    if ( pid == 0){
+    if (pid == 0)
+    {
         terminateProc = currentProcess;
-    } else {
+    }
+    else
+    {
 
         terminateProc = searchProc(pid, readyQueue);
     }
 
-    if(emptyChild(terminateProc)){
+    if (emptyChild(terminateProc))
+    {
         outChild(terminateProc);
         freePcb(terminateProc);
         currentProcess--;
-    } else {
+    }
+    else
+    {
 
         killChildren(terminateProc);
     }
@@ -68,47 +82,82 @@ void terminateProcess(int pid){
     scheduler();
 }
 
-void killChildren(pcb_t *proc){
+void killChildren(pcb_t *proc)
+{
 
-    
     if (emptyChild(proc))
     {
-        //non ha figli, uccido processo
-        //primo punto, rimuovo proc dalla lista dei figli del padre
+        // non ha figli, uccido processo
+        // primo punto, rimuovo proc dalla lista dei figli del padre
         outChild(proc);
-        //svariati altri punti...
-        
-    } else {
-    // ha figli, chiamata ricorsiva su di essi
-        while(!emptyChild(proc)){
+        // svariati altri punti...
+    }
+    else
+    {
+        // ha figli, chiamata ricorsiva su di essi
+        while (!emptyChild(proc))
+        {
             /*
             DA CONTROLLARE
             bisogna passare il figlio di proc alla funzione killChildren
             ma proc->p_child è di tipo list_head, la funzione vuole pcb_t
             sono estremamente dubbiosa del funzionamento di questo container of
             */
-            pcb_t *passChild = container_of(proc, pcb_t, p_child);
+            pcb_t *passChild = container_of((&proc->p_child)->next, pcb_t, p_sib);
 
             killChildren(passChild);
         }
     }
-    
-
 }
 
-pcb_t *searchProc(int pid, struct list_head *procQueue){
+pcb_t *searchProc(int pid, struct list_head *procQueue)
+{
 
     pcb_t *returnProc = NULL;
     struct list_head *x;
-        
-        list_for_each(x, procQueue)
+
+    list_for_each(x, procQueue)
+    {
+        if (container_of(x, pcb_t, p_list)->p_pid == pid)
         {
-            if (container_of(x, pcb_t, p_list)->p_pid == pid)
-            {
-                returnProc = container_of(x, pcb_t, p_list);
-            }
+            returnProc = container_of(x, pcb_t, p_list);
         }
+    }
 
     return returnProc;
+}
 
+// da ricontrollare perche non abbiamo capito una  sega
+// controllare se ci va il copystate
+void passeren(state_t *exceptionState)
+{
+    // prendo l'indirizzo del semaforo
+    int *semAddr = exceptionState->reg_a1;
+
+    if (*semAddr > 0)
+    {
+        *semAddr--;
+        LDST(exceptionState);
+    }
+    else
+    {
+        insertBlocked(semAddr, currentProcess);
+        scheduler();
+    }
+}
+
+//da ricontrollare anche sta merda
+void verhogen(state_t *exceptionState){
+    // prendo l'indirizzo del semaforo
+    int *semAddr = exceptionState->reg_a1;
+    pcb_t *removedproq = removeBlocked(semAddr);
+    if (removedproq == NULL)
+    {
+        *semAddr++;
+        LDST(exceptionState);
+    }else{
+        //controllare se serve la &
+        insertProcQ(readyQueue, removedproq);
+    }
+    
 }

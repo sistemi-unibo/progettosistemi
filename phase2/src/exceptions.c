@@ -8,6 +8,7 @@ void exceptionHandler()
     //cause è la Cause.ExcCode, i bit da 2 a 6 del cause register
     int cause = getCAUSE() & GETEXECCODE;
     state_t* exceptionState = (state_t*)BIOSDATAPAGE;
+    //controllare cosa far con il registro v0 (lore)
     cause = cause >> CAUSESHIFT;
 
     switch (cause)
@@ -78,8 +79,7 @@ void syscallHandler(state_t *exceptionState) {
         passupordie(GENERALEXCEPT, exceptionState); 
 
 
-    }
-
+    }else{
     //else se è in kernel mode:
     //switch in base al tipo
     //capire poi cosa passarci come parametri
@@ -97,12 +97,12 @@ void syscallHandler(state_t *exceptionState) {
     
     case PASSEREN:
     //SYS3
-        passeren();
+        passeren(exceptionState);
         break;
 
     case VERHOGEN:
     //SYS4
-        veroghen();
+        verhogen();
         break;
     
     case DOIO:
@@ -141,6 +141,9 @@ void syscallHandler(state_t *exceptionState) {
         passupordie(GENERALEXCEPT, exceptionState);
         break;
     }
+
+    }
+
 }
 
 void copyOfState(state_t* source, state_t* dest){
