@@ -26,7 +26,9 @@
     "libumps.h": "c",
     "syscall.h": "c",
     "exceptions.h": "c",
-    "container_of.h": "c"
+    "container_of.h": "c",
+    "list.h": "c",
+    "const.h": "c"
   }
 
 }

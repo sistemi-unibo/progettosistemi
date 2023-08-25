@@ -127,7 +127,7 @@ pcb_t *searchProc(int pid, struct list_head *procQueue)
     return returnProc;
 }
 
-// da ricontrollare perche non abbiamo capito una  sega
+// da ricontrollare 
 // controllare se ci va il copystate
 void passeren(state_t *exceptionState)
 {
@@ -146,7 +146,7 @@ void passeren(state_t *exceptionState)
     }
 }
 
-//da ricontrollare anche sta merda
+//da ricontrollare 
 void verhogen(state_t *exceptionState){
     // prendo l'indirizzo del semaforo
     int *semAddr = exceptionState->reg_a1;
@@ -154,10 +154,33 @@ void verhogen(state_t *exceptionState){
     if (removedproq == NULL)
     {
         *semAddr++;
-        LDST(exceptionState);
+        
     }else{
         //controllare se serve la &
         insertProcQ(readyQueue, removedproq);
+        
     }
-    
+    LDST(exceptionState);
 }
+
+int DoIo(state_t *exceptionState){
+    
+    //command address
+    int *cmdAddr = exceptionState->reg_a1;
+    int *cmdValues = exceptionState->reg_a2;
+}
+
+int get_CPU_Time(state_t *exceptionState){
+
+    cpu_t actual_time;
+    STCK(actual_time);
+
+    //currentProcess->p_time += (actual_time - );
+
+    //altrimenti p_time = 5000 - getTIMER ??
+
+}
+
+
+
+
