@@ -163,14 +163,14 @@ void verhogen(state_t *exceptionState){
     LDST(exceptionState);
 }
 
-int DoIo(state_t *exceptionState){
+int DoIo(state_t *exceptionState){ //non finita
     
     //command address
     int *cmdAddr = exceptionState->reg_a1;
     int *cmdValues = exceptionState->reg_a2;
 }
 
-int get_CPU_Time(state_t *exceptionState){
+int get_CPU_Time(state_t *exceptionState){ //non finita
 
     cpu_t actual_time;
     STCK(actual_time);
@@ -181,6 +181,39 @@ int get_CPU_Time(state_t *exceptionState){
 
 }
 
+
+support_t* Get_Support_Data(){ //da capire se prima del return devo chiamare LSDT(exceptionState). In questo caso passo "state_t* exceptionState" alla funzione come parametro
+    support_t *supportDataPtr=NULL;
+
+    if(currentProcess->p_supportStruct!=NULL){
+        supportDataPtr=currentProcess->p_supportStruct;
+    }
+
+    return(supportDataPtr);
+}
+
+
+int Get_Process_Id(int parent){
+
+    if(parent==0){
+        return(currentProcess->p_pid);
+    }
+    else{
+        if(currentProcess->namespaces==currentProcess->p_parent->namespaces){ //non sono sicuro che si faccia così a controllare che il namespace del parent è uguale al namespace del figlio (perché "namespaces" è una lista e non so se devo controllare che tutta la lista del parent sia uguale a tutta la lista del figlio, oppure devo confrontare solo un elemento e nel caso quale?)
+            return(currentProcess->p_parent->p_pid);
+        }
+        else{
+            return(0);
+        }
+    }
+    
+}
+
+
+
+int Get_Children(int *children, int size){ //siccome la funzione dovrebbe ritornare un array, ma questo in c non è possibile devo usare array dinamici con puntatori e devo rivedere come si usano perché non mi ricordo
+
+}
 
 
 
