@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "include/pcb.h"
 #include "include/ash.h"
 #include "include/ns.h"
@@ -7,9 +8,14 @@
 #include "scheduler.h"
 #include "include/exceptions.h"
 
-
+void *memcpy(void *dest, const void *src, size_t n)
+{
+    for (size_t i = 0; i < n; i++)
+    {
+        ((char *)dest)[i] = ((char *)src)[i];
+    }
+}
 // da controllare
-
 
 extern void uTLB_RefillHandler();
 extern void test();
@@ -41,6 +47,12 @@ void nullifySupport_t(support_t *p_supportStruct)
     }
 }
 
+int processCount = 0;   // number of alive processes
+int softBlockCount = 0; // number of processes in soft block
+struct list_head *readyQueue;
+pcb_t *currentProcess = NULL;            // current active process
+int subDeviceSemaphores[NUM_SEMAPHORES]; // array of semaphores for each subdevice
+
 int main()
 {
 
@@ -51,18 +63,13 @@ int main()
 
     // initialize variables
 
-    int processCount = 0;   // number of alive processes
-    int softBlockCount = 0; // number of processes in soft block
-
-    static struct list_head *readyQueue;
+    // controllare se bisogna metterla fuori dal main
     mkEmptyProcQ(readyQueue); // ready queue processes
-
-    pcb_t *currentProcess = NULL; // current active process
 
     // DA CONTROLLARE
 
     // semaphores initialization
-    int subDeviceSemaphores[NUM_SEMAPHORES]; // array of semaphores for each subdevice
+    // controllare se bisogna metterla fuori dal main
     for (int i = 0; i < NUM_SEMAPHORES; i++)
     {
         subDeviceSemaphores[i] = 0;
@@ -142,7 +149,7 @@ int main()
     // interrupts enabled, process local timer enabled, kernel mode on
     procState.status = ALLOFF | IEPON | IMON | TEBITON;
 
-    //the processor state structure is set to our created state
+    // the processor state structure is set to our created state
     proc->p_s = procState;
 
     // set all tree fields to  NULL
@@ -159,7 +166,7 @@ int main()
     // support_t initialized
     nullifySupport_t(proc->p_supportStruct);
 
-    //nel caso non funzioni fare proc->p_supportStruct = NULL
+    // nel caso non funzioni fare proc->p_supportStruct = NULL
 
     insertProcQ(readyQueue, proc);
 

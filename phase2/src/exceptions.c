@@ -92,7 +92,7 @@ void syscallHandler(state_t *exceptionState) {
     
     case TERMPROCESS:
     //SYS2
-        terminate_process(currentProcess->p_pid);
+        terminateProcess(currentProcess->p_pid);
         break;
     
     case PASSEREN:

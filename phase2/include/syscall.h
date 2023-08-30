@@ -5,6 +5,10 @@
 #include "ns.h"
 #include "ash.h"
 
+extern int processCount;
+extern pcb_t *currentProcess;
+extern struct list_head *readyQueue;
+
 /*
 First system call:
 creates a process and inserts it in the ready queue

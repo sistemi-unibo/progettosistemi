@@ -1,8 +1,6 @@
 #include "include/syscall.h"
 
-extern int processCount;
-extern pcb_t *currentProcess;
-extern struct list_head *readyQueue;
+
 
 // da controllare i vari casi in cui i parametri sono NULL e i casting
 int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
