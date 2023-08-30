@@ -41,7 +41,7 @@ void passupordie(int index, state_t *exceptionState) //pag 22-23 phase2.book
     if (&(currentProcess->p_supportStruct) == NULL)
     {
         //probabilmente sbagliata 
-        terminate_process(); 
+        terminateProcess(currentProcess->p_pid); 
         //SYSCALL(2, &(currentProcess->p_pid), 0,0);
     }
     else{
@@ -87,12 +87,12 @@ void syscallHandler(state_t *exceptionState) {
     {
     case CREATEPROCESS:
     //SYS1
-        createProcess();
+        createProcess(exceptionState,currentProcess->p_supportStruct, currentProcess->namespaces);
         break;
     
     case TERMPROCESS:
     //SYS2
-        terminate_process();
+        terminate_process(currentProcess->p_pid);
         break;
     
     case PASSEREN:
@@ -102,37 +102,37 @@ void syscallHandler(state_t *exceptionState) {
 
     case VERHOGEN:
     //SYS4
-        verhogen();
+        verhogen(exceptionState);
         break;
     
     case DOIO:
     //SYS5
-        Do_IO();
+        DoIo(exceptionState);
         break;
     
     case GETTIME:
     //SYS6
-        get_cpu_time();
+        get_CPU_Time(exceptionState);
         break;
     
     case CLOCKWAIT:
     //SYS7
-        wait_for_clock();
+      //  Wait_For_Clock();
         break;
 
     case GETSUPPORTPTR:
     //SYS8
-        get_support_data();
+        Get_Support_Data();
         break;
 
     case GETPROCESSID:
     //SYS9
-        get_process_ID();
+        Get_Process_Id(exceptionState->reg_a1);
         break;
 
     case GETCHILDREN:
     //SYS10
-        get_children();
+         Get_Children();
         break;
 
 
