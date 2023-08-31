@@ -166,6 +166,16 @@ int DoIo(state_t *exceptionState){ //non finita
     //command address
     int *cmdAddr = exceptionState->reg_a1;
     int *cmdValues = exceptionState->reg_a2;
+    int size = sizeof(cmdValues)/sizeof(cmdValues[0]);
+
+//se sono terminali
+    if (size == 2)
+    {
+        
+    }else{
+
+    }
+    
 }
 
 int get_CPU_Time(state_t *exceptionState){ //non finita
