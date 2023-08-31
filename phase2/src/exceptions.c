@@ -132,7 +132,7 @@ void syscallHandler(state_t *exceptionState) {
 
     case GETCHILDREN:
     //SYS10
-         Get_Children();
+         Get_Children(0,0);
         break;
 
 
