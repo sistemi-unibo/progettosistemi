@@ -97,7 +97,7 @@ void syscallHandler(state_t *exceptionState) {
     
     case PASSEREN:
     //SYS3
-        passeren(exceptionState);
+        passeren(exceptionState, exceptionState->reg_a1);
         break;
 
     case VERHOGEN:

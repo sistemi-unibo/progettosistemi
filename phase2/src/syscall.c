@@ -127,10 +127,8 @@ pcb_t *searchProc(int pid, struct list_head *procQueue)
 
 // da ricontrollare 
 // controllare se ci va il copystate
-void passeren(state_t *exceptionState)
+void passeren(state_t *exceptionState, int* semAddr)
 {
-    // prendo l'indirizzo del semaforo
-    int *semAddr = exceptionState->reg_a1;
 
     if (*semAddr > 0)
     {
@@ -167,6 +165,39 @@ int DoIo(state_t *exceptionState){ //non finita
     int *cmdAddr = exceptionState->reg_a1;
     int *cmdValues = exceptionState->reg_a2;
     int size = sizeof(cmdValues)/sizeof(cmdValues[0]);
+    int dev = (unsigned int)(cmdAddr - DEV_REG_START)/DEV_REG_SIZE;
+    
+
+    switch (dev)
+    {
+    case 0 ... 31:
+        //non terminal, linee 3-6
+        dtpreg_t* cmdAddrCasted = (dtpreg_t*)cmdAddr;
+        cmdAddrCasted->status = cmdValues[0];
+        cmdAddrCasted->command = cmdValues[1];
+        cmdAddrCasted->data0 = cmdValues[2];
+        cmdAddrCasted->data1 = cmdValues[3];
+        break;
+    case 32 ... 47:
+        //terminal linea 7
+        termreg_t* terminal = (termreg_t*)cmdAddr;
+
+        if (dev%2 == 0)
+        {
+            //receive
+            terminal->recv_status= cmdValues[0];
+            terminal->recv_command=cmdValues[1];
+        }else{
+            //transmit
+        }
+        
+        break;
+    default:
+        break;
+    }
+
+    passeren(exceptionState, subDeviceSemaphores[dev]);
+    
 
 //se sono terminali
     if (size == 2)

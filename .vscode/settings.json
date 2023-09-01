@@ -28,7 +28,8 @@
     "exceptions.h": "c",
     "container_of.h": "c",
     "list.h": "c",
-    "const.h": "c"
+    "const.h": "c",
+    "arch.h": "c"
   }
 
 }

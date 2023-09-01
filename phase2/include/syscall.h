@@ -4,10 +4,12 @@
 #include "exceptions.h"
 #include "ns.h"
 #include "ash.h"
+#include <umps3/umps/arch.h>
 
 extern int processCount;
 extern pcb_t *currentProcess;
 extern struct list_head *readyQueue;
+extern int subDeviceSemaphores[NUM_SEMAPHORES];
 
 /*
 First system call:
@@ -32,7 +34,7 @@ Searches for a process with a given pid in a given queue
 pcb_t *searchProc(int pid, struct list_head *procQueue);
 
 
-void passeren(state_t *exceptionState);
+void passeren(state_t *exceptionState, int* semAddr);
 
 void verhogen(state_t *exceptionState);
 
