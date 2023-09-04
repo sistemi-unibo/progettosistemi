@@ -1,7 +1,5 @@
 #include "include/syscall.h"
 
-
-
 // da controllare i vari casi in cui i parametri sono NULL e i casting
 int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
 {
@@ -125,9 +123,9 @@ pcb_t *searchProc(int pid, struct list_head *procQueue)
     return returnProc;
 }
 
-// da ricontrollare 
+// da ricontrollare
 // controllare se ci va il copystate
-void passeren(state_t *exceptionState, int* semAddr)
+void passeren(state_t *exceptionState, int *semAddr)
 {
 
     if (*semAddr > 0)
@@ -142,117 +140,125 @@ void passeren(state_t *exceptionState, int* semAddr)
     }
 }
 
-//da ricontrollare 
-void verhogen(state_t *exceptionState){
+// da ricontrollare
+void verhogen(state_t *exceptionState)
+{
     // prendo l'indirizzo del semaforo
     int *semAddr = exceptionState->reg_a1;
     pcb_t *removedproq = removeBlocked(semAddr);
     if (removedproq == NULL)
     {
         *semAddr++;
-        
-    }else{
-        //controllare se serve la &
+    }
+    else
+    {
+        // controllare se serve la &
         insertProcQ(readyQueue, removedproq);
-        
     }
     LDST(exceptionState);
 }
 
-int DoIo(state_t *exceptionState){ //non finita
-    
-    //command address
+int DoIo(state_t *exceptionState)
+{ // non finita
+
+    // command address
     int *cmdAddr = exceptionState->reg_a1;
     int *cmdValues = exceptionState->reg_a2;
-    int size = sizeof(cmdValues)/sizeof(cmdValues[0]);
-    int dev = (unsigned int)(cmdAddr - DEV_REG_START)/DEV_REG_SIZE;
-    
+    int size = sizeof(cmdValues) / sizeof(cmdValues[0]);
+    int dev = (unsigned int)(cmdAddr - DEV_REG_START) / DEV_REG_SIZE;
+
+    dtpreg_t *cmdAddrCasted;
+    termreg_t *terminal;
+    if (size == 2)
+    {
+        // terminal
+    }
+    else
+    {
+        // non terminal
+    }
 
     switch (dev)
     {
     case 0 ... 31:
-        //non terminal, linee 3-6
-        dtpreg_t* cmdAddrCasted = (dtpreg_t*)cmdAddr;
+        // non terminal, linee 3-6
+        cmdAddrCasted = (dtpreg_t *)cmdAddr;
         cmdAddrCasted->status = cmdValues[0];
         cmdAddrCasted->command = cmdValues[1];
         cmdAddrCasted->data0 = cmdValues[2];
         cmdAddrCasted->data1 = cmdValues[3];
         break;
     case 32 ... 47:
-        //terminal linea 7
-        termreg_t* terminal = (termreg_t*)cmdAddr;
+        // terminal linea 7
+        terminal = (termreg_t *)cmdAddr;
 
-        if (dev%2 == 0)
+        if (dev % 2 == 0)
         {
-            //receive
-            terminal->recv_status= cmdValues[0];
-            terminal->recv_command=cmdValues[1];
-        }else{
-            //transmit
+            // receive
+            terminal->recv_status = cmdValues[0];
+            terminal->recv_command = cmdValues[1];
         }
-        
+        else
+        {
+            // transmit
+            terminal->transm_status = cmdValues[0];
+            terminal->transm_command = cmdValues[1];
+        }
+
         break;
     default:
+        return -1;
         break;
     }
 
     passeren(exceptionState, subDeviceSemaphores[dev]);
-    
 
-//se sono terminali
-    if (size == 2)
-    {
-        
-    }else{
-
-    }
-    
+    return 0;
 }
 
-int get_CPU_Time(state_t *exceptionState){ //non finita
+int get_CPU_Time(state_t *exceptionState)
+{ // non finita
 
     cpu_t actual_time;
     STCK(actual_time);
 
-    //currentProcess->p_time += (actual_time - );
+    // currentProcess->p_time += (actual_time - );
 
-    //altrimenti p_time = 5000 - getTIMER ??
-
+    // altrimenti p_time = 5000 - getTIMER ??
 }
 
+support_t *Get_Support_Data()
+{ // da capire se prima del return devo chiamare LSDT(exceptionState). In questo caso passo "state_t* exceptionState" alla funzione come parametro
+    support_t *supportDataPtr = NULL;
 
-support_t* Get_Support_Data(){ //da capire se prima del return devo chiamare LSDT(exceptionState). In questo caso passo "state_t* exceptionState" alla funzione come parametro
-    support_t *supportDataPtr=NULL;
-
-    if(currentProcess->p_supportStruct!=NULL){
-        supportDataPtr=currentProcess->p_supportStruct;
+    if (currentProcess->p_supportStruct != NULL)
+    {
+        supportDataPtr = currentProcess->p_supportStruct;
     }
 
-    return(supportDataPtr);
+    return (supportDataPtr);
 }
 
+int Get_Process_Id(int parent)
+{
 
-int Get_Process_Id(int parent){
-
-    if(parent==0){
-        return(currentProcess->p_pid);
+    if (parent == 0)
+    {
+        return (currentProcess->p_pid);
     }
-    else{
-        if(currentProcess->namespaces==currentProcess->p_parent->namespaces){ //non sono sicuro che si faccia così a controllare che il namespace del parent è uguale al namespace del figlio (perché "namespaces" è una lista e non so se devo controllare che tutta la lista del parent sia uguale a tutta la lista del figlio, oppure devo confrontare solo un elemento e nel caso quale?)
-            return(currentProcess->p_parent->p_pid);
+    else
+    {
+        if (currentProcess->namespaces == currentProcess->p_parent->namespaces)
+        { // non sono sicuro che si faccia così a controllare che il namespace del parent è uguale al namespace del figlio (perché "namespaces" è una lista e non so se devo controllare che tutta la lista del parent sia uguale a tutta la lista del figlio, oppure devo confrontare solo un elemento e nel caso quale?)
+            return (currentProcess->p_parent->p_pid);
         }
-        else{
-            return(0);
+        else
+        {
+            return (0);
         }
     }
-    
 }
 
-
-
-int Get_Children(int *children, int size){ //siccome la funzione dovrebbe ritornare un array, ma questo in c non è possibile devo usare array dinamici con puntatori e devo rivedere come si usano perché non mi ricordo
-
+int Get_Children(int *children, int size)
+{ // siccome la funzione dovrebbe ritornare un array, ma questo in c non è possibile devo usare array dinamici con puntatori e devo rivedere come si usano perché non mi ricordo
 }
-
-
-
