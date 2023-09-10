@@ -4,12 +4,13 @@ extern pcb_t *currentProcess;
 
 void exceptionHandler()
 {
-    // prendo la causa dell'eccezione e shifto i bit di 2
-    // cause è la Cause.ExcCode, i bit da 2 a 6 del cause register
+    // taking exception cause and shifting bits of 2 to the right
+    // because cause is the Cause.ExcCode, bits from 2 to 6 of the cause register
     int cause = getCAUSE() & GETEXECCODE;
-    state_t *exceptionState = (state_t *)BIOSDATAPAGE;
-    // controllare cosa far con il registro v0 (lore)
     cause = cause >> CAUSESHIFT;
+
+    // taking the state of the exception
+    state_t *exceptionState = (state_t *)BIOSDATAPAGE;
 
     switch (cause)
     {
@@ -27,7 +28,7 @@ void exceptionHandler()
         syscallHandler(exceptionState);
         break;
 
-    // da 4 a 7 e da 9 a 12
+    // from 4 to 7 and from 9 to 12
     default:
         // program trap exception handler
         passupordie(GENERALEXCEPT, exceptionState);
@@ -35,56 +36,50 @@ void exceptionHandler()
     }
 }
 
-void passupordie(int index, state_t *exceptionState) // pag 22-23 phase2.book
+void passupordie(int index, state_t *exceptionState)
 {
-    // ricontrollare la &
     if (&(currentProcess->p_supportStruct) == NULL)
     {
-        // probabilmente sbagliata
+        // if the process has no support struct it is terminated
         terminateProcess(currentProcess->p_pid);
-        // SYSCALL(2, &(currentProcess->p_pid), 0,0);
     }
     else
     {
-
-        // da implementare copyState
-
-        /* Copio lo stato del processo che ha causato l'eccezione nella support struct */
+        // copying the state of the process that caused the exception in the support struct
         copyOfState(exceptionState, &(currentProcess->p_supportStruct->sup_exceptState[index]));
 
-        /* Salvo il valore dello stack pointer, dello status e del program counter nelle variabili*/
+        // saving values of stack pointer, status and program counter in the support struct
         unsigned int stackPointer = currentProcess->p_supportStruct->sup_exceptContext[index].stackPtr;
         unsigned int status = currentProcess->p_supportStruct->sup_exceptContext[index].status;
         unsigned int pcounter = currentProcess->p_supportStruct->sup_exceptContext[index].pc;
 
-        /* Eseguo la macro che gestisce l'eccezione (penso passandola a un livello superiore) */
         LDCXT(stackPointer, status, pcounter);
     }
 }
 
 void syscallHandler(state_t *exceptionState)
 {
-    // prendo l'exception state
+    // incrementing program counter by one word
     exceptionState->pc_epc += WORDLEN;
+
     exceptionState->reg_v0 = SYSCALL(exceptionState->reg_a0, exceptionState->reg_a1, exceptionState->reg_a2, exceptionState->reg_a3);
 
-    // leggo nel registro a0 il tipo di eccezione
+    // exception type is read from register a0
     int sysType = exceptionState->reg_a0;
 
-    // se è in user mode fai
-    // la and tra lo status register dell'exceptionstate e userpon dee fare 0 se il processo è in kernel mode e diverso se è in user mode
+    // and operation between status register and userpon should be 0
+    // if the process is in kernel mode and different if it is in user mode
     if (exceptionState->status & USERPON != ALLOFF)
     {
-        // sets the Cause.ExcCode a RI (reserved instruction) e poi chiama l'exception handler
+        // user mode
+        // sets the Cause.ExcCode a RI (reserved instruction) then calls exception handler
 
         exceptionState->cause |= (PRIVINSTR << CAUSESHIFT);
         passupordie(GENERALEXCEPT, exceptionState);
     }
     else
     {
-        // else se è in kernel mode:
-        // switch in base al tipo
-        // capire poi cosa passarci come parametri
+        // kernel mode
 
         switch (sysType)
         {
@@ -161,5 +156,3 @@ void copyOfState(state_t *source, state_t *dest)
         dest->gpr[i] = source->gpr[i];
     }
 }
-
-// implementare interruptHandler, tutte system call

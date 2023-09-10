@@ -16,11 +16,11 @@ First system call:
 creates a process and inserts it in the ready queue
 this process is going to be the child of the current process
 */
-int createProcess (state_t *statep, support_t *supportp, nsd_t *ns);
+int createProcess(state_t *statep, support_t *supportp, nsd_t *ns);
 /*
 Second system call:
 terminates a process and all its children
-if pid == 0, terminates the current process otherwise terminates the process 
+if pid == 0, terminates the current process otherwise terminates the process
 corresponding to the pid
 */
 void terminateProcess(int pid);
@@ -33,16 +33,19 @@ Searches for a process with a given pid in a given queue
 */
 pcb_t *searchProc(int pid, struct list_head *procQueue);
 
+// P function
+void passeren(state_t *exceptionState, int *semAddr);
 
-void passeren(state_t *exceptionState, int* semAddr);
-
+// V function
 void verhogen(state_t *exceptionState);
 
+// wait for a peripheral device
 int DoIo(state_t *exceptionState);
 
+// get CPU time
 int get_CPU_Time(state_t *exceptionState);
 
-support_t* Get_Support_Data();
+support_t *Get_Support_Data();
 
 int Get_Process_Id(int parent);
 

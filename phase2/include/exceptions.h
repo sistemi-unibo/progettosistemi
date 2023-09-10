@@ -9,12 +9,16 @@
 #include "scheduler.h"
 #include "syscall.h"
 
+// handles the exception based on what caused it
 void exceptionHandler();
+
+// either terminates current process or passes the exception to the support struct
 void passupordie(int index, state_t *exceptionState);
+
+// handles the syscall exception based on type
 void syscallHandler(state_t *exceptionState);
-/*
-copies the entire state pointed by source into the state pointed by dest
-*/
-void copyOfState(state_t* source, state_t* dest);
+
+// copies the entire state pointed by source into the state pointed by dest
+void copyOfState(state_t *source, state_t *dest);
 
 #endif

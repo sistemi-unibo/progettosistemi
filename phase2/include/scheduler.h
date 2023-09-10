@@ -13,7 +13,10 @@ extern struct list_head *readyQueue;
 extern pcb_t *currentProcess;
 extern int subDeviceSemaphores[NUM_SEMAPHORES];
 
+// checks ready queue, process count and soft block count to determine the case
 int check_case();
+
+// scheduler function
 void scheduler();
 
 #endif

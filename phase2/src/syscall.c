@@ -1,6 +1,5 @@
 #include "include/syscall.h"
 
-// da controllare i vari casi in cui i parametri sono NULL e i casting
 int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
 {
     pcb_t *newProcess = allocPcb();
@@ -18,11 +17,8 @@ int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
 
         insertChild(currentProcess, newProcess);
 
-        // da controllare, forse va fatto casting
         copyOfState(statep->reg_a1, &(newProcess->p_s));
-        // da controllare, forse va fatto casting
-        //  da controllare come mai passiamo supportp come parametro
-        // ma non viene utilizzato
+
         newProcess->p_supportStruct = statep->reg_a2;
 
         newProcess->p_time = 0;
@@ -30,12 +26,12 @@ int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
 
         if (ns != NULL)
         {
-            // addNs ritorna TRUE o FALSE, da controllare
+
             addNamespace(newProcess, ns);
         }
         else
         {
-            // eredita i namespace del padre
+            // inherit from parent
             for (int i = 0; i < NS_TYPE_MAX; i++)
             {
                 addNamespace(newProcess, currentProcess->namespaces[i]);
@@ -47,8 +43,6 @@ int createProcess(state_t *statep, support_t *supportp, nsd_t *ns)
     return newProcess->p_pid;
 }
 
-// controllare caso in cui searchProc restituisce NULL
-//(nessun proc con id = pid trovato)
 void terminateProcess(int pid)
 {
     pcb_t *terminateProc = NULL;
@@ -83,24 +77,15 @@ void killChildren(pcb_t *proc)
 
     if (emptyChild(proc))
     {
-        // non ha figli, uccido processo
-        // primo punto, rimuovo proc dalla lista dei figli del padre
         outChild(proc);
-        // svariati altri punti...
+        // ...
     }
     else
     {
-        // ha figli, chiamata ricorsiva su di essi
+        // recursive call on children
         while (!emptyChild(proc))
         {
-            /*
-            DA CONTROLLARE
-            bisogna passare il figlio di proc alla funzione killChildren
-            ma proc->p_child è di tipo list_head, la funzione vuole pcb_t
-            sono estremamente dubbiosa del funzionamento di questo container of
-            */
             pcb_t *passChild = container_of((&proc->p_child)->next, pcb_t, p_sib);
-
             killChildren(passChild);
         }
     }
@@ -123,8 +108,6 @@ pcb_t *searchProc(int pid, struct list_head *procQueue)
     return returnProc;
 }
 
-// da ricontrollare
-// controllare se ci va il copystate
 void passeren(state_t *exceptionState, int *semAddr)
 {
 
@@ -140,10 +123,9 @@ void passeren(state_t *exceptionState, int *semAddr)
     }
 }
 
-// da ricontrollare
 void verhogen(state_t *exceptionState)
 {
-    // prendo l'indirizzo del semaforo
+
     int *semAddr = exceptionState->reg_a1;
     pcb_t *removedproq = removeBlocked(semAddr);
     if (removedproq == NULL)
@@ -152,31 +134,23 @@ void verhogen(state_t *exceptionState)
     }
     else
     {
-        // controllare se serve la &
         insertProcQ(readyQueue, removedproq);
     }
     LDST(exceptionState);
 }
 
 int DoIo(state_t *exceptionState)
-{ // non finita
-
+{
     // command address
     int *cmdAddr = exceptionState->reg_a1;
     int *cmdValues = exceptionState->reg_a2;
-    int size = sizeof(cmdValues) / sizeof(cmdValues[0]);
+
+    // cmdAddr - offset (start) / size of a single device register
+    // to obtain device number
     int dev = (unsigned int)(cmdAddr - DEV_REG_START) / DEV_REG_SIZE;
 
     dtpreg_t *cmdAddrCasted;
     termreg_t *terminal;
-    if (size == 2)
-    {
-        // terminal
-    }
-    else
-    {
-        // non terminal
-    }
 
     switch (dev)
     {
@@ -217,18 +191,16 @@ int DoIo(state_t *exceptionState)
 }
 
 int get_CPU_Time(state_t *exceptionState)
-{ // non finita
+{
 
     cpu_t actual_time;
     STCK(actual_time);
 
-    // currentProcess->p_time += (actual_time - );
-
-    // altrimenti p_time = 5000 - getTIMER ??
+    // ...
 }
 
 support_t *Get_Support_Data()
-{ // da capire se prima del return devo chiamare LSDT(exceptionState). In questo caso passo "state_t* exceptionState" alla funzione come parametro
+{
     support_t *supportDataPtr = NULL;
 
     if (currentProcess->p_supportStruct != NULL)
@@ -249,7 +221,7 @@ int Get_Process_Id(int parent)
     else
     {
         if (currentProcess->namespaces == currentProcess->p_parent->namespaces)
-        { // non sono sicuro che si faccia così a controllare che il namespace del parent è uguale al namespace del figlio (perché "namespaces" è una lista e non so se devo controllare che tutta la lista del parent sia uguale a tutta la lista del figlio, oppure devo confrontare solo un elemento e nel caso quale?)
+        {
             return (currentProcess->p_parent->p_pid);
         }
         else
@@ -260,5 +232,6 @@ int Get_Process_Id(int parent)
 }
 
 int Get_Children(int *children, int size)
-{ // siccome la funzione dovrebbe ritornare un array, ma questo in c non è possibile devo usare array dinamici con puntatori e devo rivedere come si usano perché non mi ricordo
+{
+    // ...
 }

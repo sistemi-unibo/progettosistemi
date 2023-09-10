@@ -1,0 +1,29 @@
+Purtroppo, al momento della stesura di questa relazione, 
+il progetto non è stato completato come inizialmente pianificato 
+per problemi di tempistiche e svariati intoppi che sorgevano
+che ci impedivano di portalo avanti in ogni sua parte.
+Nonostante il non completamento, il progetto ha raggiunto uno stato 
+che riteniamo meriti una valutazione.
+
+L'implementazione della fase di inizializzazione è stata completata con successo, 
+compresa di inizializzazione delle strutture dati, variabili, dispositivi,
+scheduler, popolazione del pass up vector.
+
+Lo scheduler è stato implementato tramite ordine FIFO, 
+in quanto la funzione di estrazione di un processo dalla coda avviene in testa
+e quella di aggiunta in coda.
+Sono stati valutati e gestiti i vari casi dipendenti dalla ready queue, process count e soft block count.
+
+La fase di gestione delle eccezioni è stata completata, 
+ad eccezione di tutta la parte riguardante gli interrupt.
+Nei casi in cui si trattasse di una TLB Trap o di una Program Trap una funzione
+valuta se terminare il processo o rimandarlo ad un altro gestore.
+Nel caso in cui si trattasse di una system call il controllo è stato dato a un gestore delle system call
+che in base al codice della syscall rimandava ad una funzione specifica.
+
+Non è stata ultimata l'implementazione di tutte le system call,
+la getCpuTime non è terminata e la getChildren è mancante.
+
+Non siamo riusciti a testare il progetto in quanto la funzione necessaria alla stampa 
+dei vari controlli (print) richiedeva che già molte funzioni e 3 system call fossero funzionanti.
+Non abbiamo trovato l'errore che non ci permetteva di andare avanti in questa fase per cui siamo rimasti bloccati.

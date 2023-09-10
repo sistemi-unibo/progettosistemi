@@ -5,8 +5,6 @@
 #define PANICCASE 4
 #define timeclock (TIMESLICE) * (*((cpu_t *)TIMESCALEADDR))
 
-
-
 int check_case()
 {
     if (!emptyProcQ(readyQueue))
@@ -31,17 +29,16 @@ void scheduler()
 {
     int cases = check_case();
     unsigned int status = getSTATUS();
+
     switch (cases)
     {
     case CONTINUECASE:
 
-        /*prendo in testa il primo proesso dalla readyQueue e lo uso come current
-        la insert inserisce in coda e la remove toglie in testa, quindi è FIFO.
-        setto il timer a 5 ms
-        modifico lo stato del processore con quello del processo
-        */
+        // taking the first process from the readyQueue and using it as current
         currentProcess = removeProcQ(readyQueue);
+        // setting the timer to 5 ms
         setTIMER(timeclock);
+        // modifying the processor status with that of the process
         LDST(&(currentProcess->p_s));
         break;
     case HALTCASE:
@@ -49,13 +46,13 @@ void scheduler()
         break;
     case WAITCASE:
 
-        // abilitiamo gli  interrupt
+        // abiliting interrupts
         status |= IEPON | IMON;
 
-        // mettiamo il PLT  ad un numero molto alto
+        // setting PLT very high
         setTIMER((__INT32_MAX__) * (*((cpu_t *)TIMESCALEADDR)));
 
-        // settiamo lo status del processore
+        // setting processor status
         setSTATUS(status);
 
         WAIT();

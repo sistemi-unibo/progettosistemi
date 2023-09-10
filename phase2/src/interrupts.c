@@ -1,5 +1,5 @@
 #include "include/interrupts.h"
 
- void interruptHandler(){
-
- }
+void interruptHandler()
+{
+}
