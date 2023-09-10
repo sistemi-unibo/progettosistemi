@@ -3,7 +3,7 @@ il progetto non è stato completato come inizialmente pianificato
 per problemi di tempistiche e svariati intoppi che sorgevano
 che ci impedivano di portalo avanti in ogni sua parte.
 Nonostante il non completamento, il progetto ha raggiunto uno stato 
-che riteniamo meriti una valutazione.
+che riteniamo possa meritare una valutazione.
 
 L'implementazione della fase di inizializzazione è stata completata con successo, 
 compresa di inizializzazione delle strutture dati, variabili, dispositivi,
